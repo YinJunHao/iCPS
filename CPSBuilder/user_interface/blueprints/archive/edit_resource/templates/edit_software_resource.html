@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">iCPS Optimizer</h1>
+    <p class="lead">
+        iCPS finds and suggests to user optimized manufacturing methods
+        in compliance with CGMP and ISO rulings.
+    </p>
+</div>
+<div class="container" style="align-self: center; align-content: center">
+    <form method="POST">
+        <div class="container" style="width: 60%; align-self: center; align-content: center" )>
+            <table class="table-striped" style="width: 100%;" align="center">
+                {{ edit_software_form.csrf_token() }}
+                <tr>
+                    <th class="index"></th>
+                    <th class="content">Category</th>
+                    <th class="content"></th>
+                    <th class="content" style="text-align: center">Edit</th>
+                </tr>
+                <tr>
+                    <td class="index">1</td>
+                    <td class="content">ID</td>
+                    <td class="content">{{ equipment_details['ID'] }}</td>
+                    <td class="content"></td>
+                </tr>
+                <tr>
+                    <td class="index">2</td>
+                    <td class="content">Name</td>
+                    <td class="content">{{ equipment_details['name'] }}</td>
+                    <td class="content">
+                        {{ edit_software_form.software_name(class_="form-control", style="text-align: left", value=equipment_details['name']) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="index">3</td>
+                    <td class="content">Type</td>
+                    <td class="content">{{ equipment_details['software_type'] }}</td>
+                    <td class="content">
+                        {{ edit_software_form.software_type(class_="form-control", style="text-align: left", value=equipment_details['name']) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="index"></td>
+                    <td class="content">New type (if applicable)</td>
+                    <td class="content"></td>
+                    <td class="content">
+                        {{ edit_software_form.software_type_new(class_="form-control", style="text-align: left") }}
+                    </td>
+                </tr>
+            </table>
+            {% from "includes/_formhelpers.html" import render_field %}
+        </div>
+
+        <div class="container" style="width: 60%; align-self: center; align-content: center" )>
+            {{ edit_software_form.submit_software(class_="btn btn-blk btn-primary", style="width: 50%") }}
+        </div>
+    </form>
+
+</div>
+{% endblock %}

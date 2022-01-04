@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Register New Task</h1>
+    <p class="lead">
+        Enter the name of the task you wish to add.
+    </p>
+</div>
+<div class="container" style="max-width: 475px">
+    {% from "includes/_formhelpers.html" import render_field %}
+    <form method="POST" business='' style="text-align:left">
+        {{ new_task_form.csrf_token() }}
+        <div class="form-group">
+            {{ render_field(new_task_form.task, class_="form-control") }}
+        </div>
+        <p align="center">
+            {{ new_task_form.submit_task(style="width: 80%;", class_="btn btn-primary") }}
+        </p>
+    </form>
+</div>
+{% endblock %}

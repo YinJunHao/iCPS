@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Manage Robot</h1>
+    <p class="lead">
+        Choose robots to delete or add new robot with the button
+    </p>
+</div>
+<div class="container">
+    <h1 class="display-10">Resource Available:</h1>
+</div>
+{% from "includes/_formhelpers.html" import render_field %}
+<div class="container" style="align-content: center">
+    <form method='POST' business=''>
+        {{ robot_list_form.csrf_token() }}
+        <div class="container" style="text-align: left">
+            <table class="table-striped" style="width: 100%;">
+                <tr>
+                    <th class="index"></th>
+                    <th class="content">ID</th>
+                    <th class="content">Name</th>
+                    <th class="content">Type</th>
+                    <th class="content">Status</th>
+                    <th class="content">Availability</th>
+                    <th class="content">Edit</th>
+                </tr>
+                {% for subfield in robot_list_form.robot_list %}
+                <tr>
+                    {% if session['is_admin'] %}
+                    <td class="index"><label> {{ subfield }} </label></td>
+                    {% else %}
+                    <td class="index"><label>{{ loop.index }}</label></td>
+                    {% endif %}
+                    <td class="content">{{ robot_db_curs[loop.index0]['ID'] }}</td>
+                    <td class="content">{{ robot_db_curs[loop.index0]['name'] }}</td>
+                    <td class="content">{{ robot_db_curs[loop.index0]['type'] }}</td>
+                    <td class="content">{{ robot_db_curs[loop.index0]['assigned'] }}</td>
+                    <td class="content">{{ robot_db_curs[loop.index0]['availability'] }}</td>
+                    <td class="content">
+                        <button class="btn btn-primary" name="edit_resource" value={{ robot_db_curs[loop.index0]['ID'] }} style="width: 100%">Edit</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% if session['is_admin'] %}
+        <p>
+            <button class="btn btn-dark" name="del_resource" value="clear_selection" style="width: 30%">Clear Selection</button>
+            <button class="btn btn-dark" name="del_resource" value="deactivate" style="width: 30%">Deactivate Resource</button>
+            <button class="btn btn-dark" name="del_resource" value="activate" style="width: 30%">Activate Resource</button>
+        </p>
+        <p>
+            <button class="btn btn-danger" name="del_resource" value="delete" style="width: 60%">Delete Resource</button>
+        </p>
+        <p>
+            <a class="btn btn-primary" style="width: 60%" href="{{ url_for('new_resource.enter_robot') }}">Add New
+                Resource</a>
+        </p>
+        {% endif %}
+    </form>
+    {% include 'includes/_messages.html' %}
+</div>
+
+
+{% endblock %}

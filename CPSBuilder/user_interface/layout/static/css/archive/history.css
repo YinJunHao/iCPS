@@ -1,0 +1,21 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "history" tab
+ * Written by Yin Jun Hao
+*/
+
+/*job_history.html*/
+
+/*filter search*/
+#filter-input {
+    background-image: url('../../images/searchicon.png'); /* Add a search icon to input */
+    background-size: 15px;
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    width: 30%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 2px solid #ddd;
+    margin-bottom: 12px;
+}

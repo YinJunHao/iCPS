@@ -1,0 +1,75 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/start/optimise_step.css') }}">
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Select Executors for {{ step_index }}</h1>
+        <p class="lead">
+            Select the executors for the selected step
+        </p>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div id="optimise-step-page">
+            <div id="parameter">
+                <h1>Parameter: </h1>
+                <select name="parameter" class="form-control">
+                {% for parameter in state_exec_list["param"] %}
+                    <option value="{{ parameter["var"] + ',' + parameter["type"] }}">{{ parameter["var"] }}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <div id="executor-selection">
+                <h1 id="executor-selection-heading">Executor Selection</h1>
+                {% for exec in state_exec_list["exec"] %}
+                    <div class="state-exec-classification"><p>Class: {{ exec["state"]["class"] }} | Type: {{ exec["state"]["type"] }}</p></div>
+                    <div id="same-as-step-index"><p>Copy Step: </p>
+                        <select name="{{'same-as-step-index,'+ exec['index']|string}} " class="form-control">>
+                            <option value=None>None</option>
+                            {% for step in step_list %}
+                                <option value="{{step['index']}}">{{step["sentence"]}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div id="same-as-exec-index">
+                        <p>Copy Executor: </p>
+                        <select name="{{ 'same-as-exec-index,'+ exec['index']|string}}" class="form-control">
+                            <option value=None>None</option>
+                            {% for state in executor_list %}
+                                <option value="{{state['index']}}">{{state["var"]}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <h3>Or select from the corresponding below</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Physical Name</th>
+                                <th>Physical Type</th>
+                                <th>Cyber Name</th>
+                                <th>Cyber Type</th>
+                                <th>Preferred Executor</th>
+                                <th>Alternative Executor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for state_exec in exec["preferred_exec"] %}
+                                    <tr>
+                                        <td>{{ state_exec["physical_resource_name"] }}</td>
+                                        <td>{{ state_exec["physical_resource_type"] }}</td>
+                                        <td>{{ state_exec["cyber_resource_name"] }}</td>
+                                        <td>{{ state_exec["cyber_resource_type"] }}</td>
+                                        <td><input class="form-check-input" type="radio" name="{{'preferred-exec,'+ exec['index']|string}}" value={{ loop.index0 }}></td>
+                                        <td><input class="form-check-input" type="checkbox" name="alternative-exec"  value="{{ exec['index']|string+ ',' +loop.index0|string }}"></td>
+                                    </tr>
+                                {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-light" type="submit" name="cancel" value="/">Cancel</button>
+                <button class="btn btn-primary" type="submit" name="confirm" value="/">Confirm</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,57 @@
+
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#table-first {
+    width: 10px;
+    padding: 2px;
+}
+
+th {
+    background: #303030;
+    color: white;
+    height: 30px;
+}
+span {
+   cursor: pointer;
+}
+td{
+    height: 50px;
+    font-weight: 400;
+}
+.inactive {
+    color: red;
+    font-weight: 500;
+}
+.active {
+    color: green;
+    font-weight: 500;
+}
+
+/*for actions*/
+#more {
+    cursor: pointer;
+}
+#dropdown-menu {
+    padding: 0px;
+}
+
+.dropdown-menu button {
+    padding: 15px 5px;
+    width: 100%;
+    text-align: left;
+    border-radius: 0;
+}
+/*For more details*/
+#more-details-icon {
+    cursor: pointer;
+}
+
+.more-details {
+    display: none;
+
+}

@@ -1,0 +1,33 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/start/select_location.css') }}">
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Select location to execute {{ step_index }}</h1>
+        <p class="lead">
+            Select the preferred location to execute the selected step
+        </p>
+    </div>
+    <div id="select-location-page">
+        <table id="table" class="table-striped">
+            <thead>
+            <tr>
+                <th>Location ID</th>
+                <th>Name</th>
+                <th></th>
+            <tr>
+            </thead>
+            <tbody>
+            <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                {% for location in location_list %}
+                    <td>{{ location }}</td>
+                    <td>Sentence</td>
+                    <td>
+                        <button value="{{ loop.index0 }}" name="location" type="submit" class="btn btn-outline-primary">Select</button>
+                    </td>
+                {% endfor %}
+            </form>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

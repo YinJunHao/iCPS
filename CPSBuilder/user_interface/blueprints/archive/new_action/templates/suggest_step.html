@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Register New Step</h1>
+    <p class="lead">
+        Choose from among the suggested step lists that suits your application best.<br>
+        Otherwise, choose "New Step List" to create one from scratch.
+    </p>
+</div>
+<div class="container">
+    <p class="lead" style="text-align: left">Action Selected: {{ action_sentence }}</p>
+    <table class="table-striped" style="width: 100%">
+        <tr>
+            <th class="index"></th>
+            <th class="content">Action Name</th>
+            <th class="content"></th>
+        </tr>
+        {% from "includes/_formhelpers.html" import render_field %}
+        {% for recommendation in recommendation_list %}
+        <form method='POST'>
+            <tr>
+                {{ choose_recommendation_form.csrf_token() }}
+                {{ choose_recommendation_form.request_id(value = loop.index0) }}
+                <td class="index">{{ loop.index }}</td>
+                <td class="content">{{ recommendation.get('action_sentence') }}</td>
+                <td class="content">
+                    <button type="button" class="btn btn-primary btn-blk" style="width:100%" data-toggle="modal"
+                        data-target="#{{ recommendation.get('action') }}">
+                        See Details
+                    </button>
+                    <div class="modal fade" id="{{ recommendation.get('action') }}" tabindex="-1" role="dialog"
+                        aria-labelledby="recommendationDetailsLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">{{
+                                        recommendation.get('action_sentence') }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table-striped" style="width: 80%">
+                                        <tr>
+                                            <th class="index"></th>
+                                            <th class="content">Step Name</th>
+                                        </tr>
+                                        {% for step in recommendation.get('step_sentence') %}
+                                        <tr>
+                                            <td class="index">{{ loop.index }}</td>
+                                            <td class="content">{{ step }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    {{ choose_recommendation_form.choose_recommendation(class_="btn btn-primary") }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </form>
+        {% endfor %}
+    </table>
+    <form method='POST'>
+        <div class="container" style="padding-top: 5%">
+            {{ new_step_form.csrf_token() }}
+            {{ new_step_form.submit_choice(class_="btn btn-primary", style="width: 100%") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="header">
+    <h1>Job Status</h1>
+    <p class="lead">
+        Status of the action step for job {{ job_detail["job_id"] }}.
+    </p>
+</div>
+<div class="container">
+    <p class="lead" style="text-align: left">{{ task_sentence }} - {{ job_detail["job_id"] }}</p>
+    <table id="table" class="table-striped" style="width: 100%">
+        <tr>
+            <th class="index"></th>
+            <th class="content">Action</th>
+            <th class="content">Time Started</th>
+            <th class="content">Time Completed</th>
+            <th class="content">Status</th>
+        </tr>
+        {% for action in job_detail["action_details_list"] %}
+        <tr>
+            <td class="index">{{ loop.index }}</td>
+            <td class="content">{{ job_detail["action_details_list"][loop.index0]["action_sentence"] }}</td>
+            <td class="content">{{ job_detail["action_details_list"][loop.index0]["action_start"] }}</td>
+            <td class="content">{{ job_detail["action_details_list"][loop.index0]["action_complete"] }}</td>
+            <td class="content">{{ job_detail["action_details_list"][loop.index0]["action_status"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p></p>
+    <form method="POST">
+            {{ close_detail_form.csrf_token() }}
+            <p>{{ close_detail_form.close_detail(class_="btn btn-secondary", style="width:100%") }}</p>
+    </form>
+</div>
+{% endblock %}

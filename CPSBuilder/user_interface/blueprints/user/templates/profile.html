@@ -1,0 +1,24 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/user/profile.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1>{{ profile_details["name"] }}'s Profile</h1>
+        <p class="lead">
+            Account details for {{ session["user_id"] }}
+        </p>
+    </div>
+    <div id="profile-page">
+        <div class="profile">
+            {% include "includes/_messages.html" %}
+            <span><b>User ID: </b><p>{{ profile_details["user_id"] }}</p></span>
+            <span><b>Name: </b><p>{{ profile_details["name"] }}</p></span>
+            <span><b>Position: </b><p>{{ profile_details["position"] }}</p></span>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <span id="action-buttons"><button class="btn btn-primary" name="password" type="submit" value="/">Change Password</button><button
+                        class="btn btn-info" name="edit" type="submit" value="/">Edit Profile</button></span>
+            </form>
+        </div>
+    </div>
+{% endblock %}

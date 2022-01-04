@@ -1,0 +1,10 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/404.css') }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div id="page404">
+        <h1>Oops, Page Not Found</h1>
+        <p>The page you were looking for is not here or not yet implemented.</p>
+        <a href="{{ url_for('main.index') }}">Return to Home</a>
+    </div>
+{% endblock %}

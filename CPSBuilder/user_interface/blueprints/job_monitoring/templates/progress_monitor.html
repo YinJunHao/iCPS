@@ -1,0 +1,79 @@
+<head>
+
+    <!--These src lines are the same as importing external libraries (webpage).-->
+    <!--If the import is not a webpage, it will import from the local directory.-->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="/static/js/refreshStatus.js"></script>
+    <!--double curly bracket is a flask variable (sent from backend to js frontend)-->
+    <!--every render of this html, the data sent to this template will be sent to the js-->
+    <!--js will load those data before connecting socketio server-->
+    <!--socketio can only receive msg when the html is rendered in js-->
+    <script type="text/javascript">
+        $(function () {
+            var completeStatus = refreshStatus({{ step_details| tojson }});
+        });
+    </script>
+</head>
+{%  extends 'layout.html' %}
+
+
+{%  block body %}
+        <main role="main" class="inner cover">
+            <div class="jumbotron text-center">
+                <h1 class="cover-heading">Progress Monitor</h1>
+                <p class="lead">
+                    Monitors Progress for job {{ job_id }}
+                </p>
+            </div>
+
+
+            <!--from Bootstrap form-->
+            <div class="container">
+                <div class="container" id="content" style="width:60%; text-align: left">
+                    <!--the loop is jinja2 loop (a templating engine flask uses for html)-->
+                    {% for action_details in job_details['action_details_list'] %}
+                    {% set action_index = loop %}
+                    <div class="card">
+                        <div class="card-header" id="card-{{action_index.index0}}">Action {{ action_index.index }}:
+                            {{ action_details['action_var'] }}</div>
+                        <div class="card-body">
+                            {% for step_details in action_details['action_exec'] %}
+                            {% set step_index = loop %}
+                            <div class="card">
+                                <div class="card-header" id="card-{{action_index.index0}}-{{step_index.index0}}">
+                                    Step {{ step_index.index }}: {{ step_details['step_var'] }}
+                                </div>
+                                {% for exec_details in step_details['exec_list'] %}
+                                {% set exec_index = loop %}
+                                    <div class="card-body" id="exec-{{action_index.index0}}-{{step_index.index0}}-{{exec_index.index0}}">
+                                        Exec {{ exec_index.index }}: {{ exec_details['actual_exec'] }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </main>
+        <footer class="mastfoot mt-auto">
+            <div class="inner">
+                <p class="lead">NUS2018</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+{%  endblock %}

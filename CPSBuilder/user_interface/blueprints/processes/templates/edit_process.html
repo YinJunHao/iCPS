@@ -1,0 +1,1041 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/processes/edit_process.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">{{ task_details["task"]["sentence"] }}</h1>
+        {% if session["new_process"] %}
+             <p class="lead">
+                Review the details of the new process
+            </p>
+        {% else %}
+            <p class="lead">
+                Editing the selected task
+            </p>
+        {% endif %}
+    </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="container" id="process-page">
+            <div class="layer">
+                <div class="row">
+                    <div class="col layer-details" id="task-layer-details-0" style="display: block">
+                        <p>name: <input class="form task-0-main" type="text" name="task-name-0" value="{{ task_details["task"]["sentence"] }}"
+                                        onchange="nameUpdate(this)" required></p>
+                        <p>layer: {{ task_details["task"]["layer"] }}
+                        <p>created by: {{ task_details["task"]["created_by"] }}</p>
+                        <p>last update: {{ task_details["task"]["last_update"] }}</p>
+                    </div>
+                    {% set ns = namespace(layer=task_details["task"]["content_layer"]) %}
+                    {% for num in range(0, task_details["task"]["layer_no"]) %}
+                        {% for layer in task_details[ns.layer] %}
+                            <div class="col layer-details" id="{{ ns.layer + '-layer-details-' + layer['index']|string  }}">
+                                <p>name: <input class="form {{ layer["layer"] + "-" + layer["index"]|string + "-main" }}" type="text" name="{{ ns.layer + "-name-" + layer["index"]|string }}" value="{{ layer["sentence"] }}" onchange="nameUpdate(this)"
+                                        required></p>
+                                <p class="replace-underscore">layer: {{ layer["layer"] }}</p>
+                                <p>created by: {{ layer["created_by"] }}</p>
+                                <p>last update: {{layer["last_update"] }}</p>
+                            </div>
+                        {% endfor %}
+                        {% if ns.layer == "objective_layer_1" %}
+                            {% set ns.layer = "step" %}
+                        {% else %}
+                            {% set ns.layer = "objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int - 1)|string %}
+                        {% endif %}
+                    {% endfor %}
+                    <div class="col">
+                        <div class="actions">
+                            <button class="btn btn-danger" data-toggle="modal"
+                                                data-target="#delete-task" type="button">Delete Task</button>
+                            <button class="btn btn-warning custom-btn" name="conflict-check" value="/">Conflict Check
+                            </button>
+                            <button type=button id="tree-nav-button" class="btn btn-info" onclick="showTree()">Tree
+                                Nav
+                            </button>
+                        </div>
+                        <div class="actions" id="edit-process-actions">
+                            <button class="btn btn-light" name="cancel" value="/">Cancel</button>
+                            <button class="btn btn-secondary" name="save-draft" value="/">Save as Draft</button>
+                            <button class="btn btn-primary" name="confirm" value="/">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="content-layer">
+                <div class="table-task" id="task-content-details-0" style="display: block">
+                    <div class="back">
+                        <a href="{{ url_for("processes.processes_list") }}"><i
+                                class="material-icons">navigate_before</i><span>Processes List</span></a>
+                    </div>
+                    <div class="content-layer replace-underscore">content
+                        layer: {{ task_details["task"]["content_layer"] }}<button class="btn btn-outline-info" name="add-layer-before" value="/">Add Layer
+                                Before
+                            </button></div>
+                    {% for content in task_details[task_details["task"]["content_layer"]] %}
+                        {% if content["index"] in task_details["task"]["content_index"] %}
+                            <div class="cont">
+                                <i class="material-icons" onclick="moreDetails(this)">chevron_right</i>
+                                <input class="form {{ task_details["task"]["content_layer"] + "-" + content["index"]|string }}" name="{{ task_details["task"]["content_layer"]+"-name-"+ content["index"]|string + "-task-0" }}" type="text"
+                                   value="{{ content["sentence"] }}" onchange="nameUpdate(this)" required>
+                                <div class="layer-buttons">
+                                    <button type="button" class="btn btn-outline-info"
+                                            id="{{ task_details["task"]["content_layer"] + "-content-layer-0" }}"
+                                            onclick="showLayer(this.id)">Details
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeContent(this)">
+                                        <i class="material-icons">delete</i>
+                                    </button>
+                                </div>
+                            </div>
+                            <table class="table table-striped content-details">
+                                <tbody>
+                                <tr>
+                                    <td><b>content name</b></td>
+                                    <td><b>content layer</b></td>
+                                    <td><b>last update</b></td>
+                                    <td><b>last updated by</b></td>
+                                </tr>
+                                {% for cont in task_details[content["content_layer"]] %}
+                                    {% if cont["index"] in content["content_index"] %}
+                                        <tr>
+                                            <td>{{ cont["sentence"] }}</td>
+                                            <td>{{ cont["layer"] }}</td>
+                                            <td>{{ cont["last_update"] }}</td>
+                                            <td>{{ cont["last_updated_by"] }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% endfor %}
+                    <div>
+                        <button id="add-objective-button" type="button" class="btn btn-outline-info"
+                                onclick="addContent(this)"><i class="material-icons">add</i></button>
+                    </div>
+                </div>
+                     {% set ns = namespace(layer=task_details["task"]["content_layer"], previous_layer="Task", previous_index="0", previous="task") %}
+                     {% for num in range(0, task_details["task"]["layer_no"]) %}
+                         {% for layer in task_details[ns.layer] %}
+                             {% if ns.layer != "step" %}
+                            <div class="table-task" id="{{ ns.layer+'-content-details-'+ layer['index']|string }}">
+                                <div class="back">
+                                    <a onclick="showLayer(this.id)" id="{{ ns.previous + "-previous-layer-" + ns.previous_index }}"><i
+                                            class="material-icons">navigate_before</i><span class="replace-underscore">{{ ns.previous_layer }}</span></a>
+                                </div>
+                                <div class="content-layer replace-underscore">content
+                                    layer: {{ layer["content_layer"] }}
+                                    <button class="btn btn-outline-info" name="add-layer-before" value="/">Add Layer
+                                        Before
+                                    </button>
+                                </div>
+                                {% for content in task_details[layer["content_layer"]] %}
+                                    {% if content["index"] in layer["content_index"] %}
+                                        <div class="cont">
+                                            <i class="material-icons" onclick="moreDetails(this)">chevron_right</i>
+                                            <input class="form {{ content["layer"] + "-" + content["index"]|string }}" name="{{ content["layer"] + "-" + content["index"]|string + "-" + layer["layer"] + "-"+ layer["index"]|string }}" type="text"
+                                                   value="{{ content["sentence"] }}" onchange="nameUpdate(this)" required>
+                                            <div class="layer-buttons">
+                                                <button type="button" class="btn btn-outline-info"
+                                                        id="{{ layer["content_layer"] + "-content-layer-" + content["index"]|string }}"
+                                                        onclick="showLayer(this.id)">Details
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger"
+                                                        onclick="removeContent(this)">
+                                                    <i class="material-icons">delete</i></button>
+                                            </div>
+                                        </div>
+                                        {% if layer["content_layer"] != "step" %}
+                                            <table class="table table-striped content-details">
+                                                <tbody>
+                                                <tr>
+                                                    <td><b>content name</b></td>
+                                                    <td><b>content layer</b></td>
+                                                    <td><b>last update</b></td>
+                                                    <td><b>last updated by</b></td>
+                                                </tr>
+                                                {% for cont in task_details[content["content_layer"]] %}
+                                                    {% if cont["index"] in content["content_index"] %}
+                                                        <tr>
+                                                            <td>{{ cont["sentence"] }}</td>
+                                                            <td>{{ cont["layer"] }}</td>
+                                                            <td>{{ cont["last_update"] }}</td>
+                                                            <td>{{ cont["last_updated_by"] }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% else %}
+                                            <table class="table table-striped content-details">
+                                                <tbody>
+                                                <tr>
+                                                    <td><b>condition</b></td>
+                                                    <td><b>sets</b></td>
+                                                </tr>
+                                                {% for location in content["location_id"] %}
+                                                    {% if loop.index == 1 %}
+                                                        <tr>
+                                                            <td>location id</td>
+                                                            <td>{{ location }}</td></tr>
+                                                    {% else %}
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>{{ location }}</td></tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>parameters</td>
+                                                    <td>
+                                                        {% for param in task_details["parameter"] %}
+                                                            {% if param["index"] in content["step_param_index"] %}
+                                                                <div>{{ param["param"]["var"] }}</div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                <div>
+                                    <button id="add-objective-button" type="button" class="btn btn-outline-info"
+                                            onclick="addContent(this)"><i class="material-icons">add</i></button>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="grid-task" id="{{ ns.layer+'-content-details-'+ layer['index']|string}}" >
+                                <div class="back">
+                                    <a onclick="showLayer(this.id)" id="{{ ns.previous + "-previous-layer-" + ns.previous_index }}"><i
+                                            class="material-icons">navigate_before</i><span class="replace-underscore">{{ ns.previous_layer }}</span></a>
+                                </div>
+                                <div class="grid-details">
+                                     <table class="table table-borderless">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="3">Parameters</th>
+                                            </tr>
+                                            <tr>
+                                                <th>name</th>
+                                                <th>type</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for param in task_details["parameter"] %}
+                                                {% if param["index"] in layer["step_param_index"] %}
+                                                    <tr>
+                                                        <td><input name="param" class="form-control name-col"
+                                                                   value="{{ param["param"]["var"] }}"></td>
+                                                        <td><select name="type" class="form-control">
+                                                            <option value="{{ param["param"]["type"] }}">
+                                                            {{ param["param"]["type"] }}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeSelection(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <tr>
+                                                <td colspan="3">
+                                                    <button type="button" class="btn btn-outline-info"
+                                                            onclick="addParam(this)"><i
+                                                            class="material-icons">add</i></button>
+                                                </td>
+                                            </tr>
+                                            <tbody>
+                                     </table>
+                                </div>
+                                <div class="grid-details">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="3">state executors</th>
+                                        </tr>
+                                        </thead>
+                                        {% for exec in task_details["state"] %}
+                                            {% if exec["index"] in layer["state_exec_index"] %}
+                                                <tbody id="{{exec["index"]|string+",state-executor"}}">
+                                                <tr>
+                                                    <th>Name:</th>
+                                                    <td><input name="{{ exec["index"]|string+',state-exec-setname' }}"
+                                                               class="form-control name-col"
+                                                               value='{{ exec["var"] }}'></td>
+                                                </tr>
+                                                    <tr>
+                                                        <th>type</th>
+                                                        <th colspan="2">class</th>
+                                                    </tr>
+                                                <tr>
+                                                    <td><select name="{{ exec["index"]|string+',state-exec-type' }}"
+                                                                class="form-control name-col option"
+                                                                onchange="populateOptionsClass({{ state_class|safe }}, this.id, this.value)"
+                                                                , id="{{ exec["index"]|string+',state-exec-type' }}">
+                                                        {% for type in ["resource", "job", "task"] %}
+                                                            {% if exec["type"] == type %}
+                                                                <option value="{{ type }}" selected>{{ type }}</option>
+                                                            {% else %}
+                                                                <option value="{{ type }}">{{ type }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}</select></td>
+                                                    <td><select name="{{ exec["index"]|string+',state-exec-class' }}"
+                                                                class="form-control name-col option"
+                                                                id="{{ exec["index"]|string+',state-exec-class' }}">
+                                                        {% for class in state_class[exec["type"]] %}
+                                                            {% if exec["class"] == class %}
+                                                                <option value="{{ class }}"
+                                                                        selected>{{ class }}</option>
+                                                            {% else %}
+                                                                <option value="{{ class }}">{{ class }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select></td>
+                                                    <td><input name="{{exec["index"]|string+',state-exec-class-diff'}}" class="form-control name-col option" placeholder="new class"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Executor Class</th>
+                                                    <th>Executor Name</th>
+                                                    <th>Executor Software</th>
+                                                </tr>
+                                                {% for executor in exec["exec"] %}
+                                                    <tr>
+                                                        <td><select
+                                                                name="{{ exec["index"]|string+',state-exec-physical-class' }}"
+                                                                class="form-control name-col option"
+                                                                onchange="populateOptions({{ physical_resource|safe }}, this.id, this.value, {{ loop.index }})"
+                                                                id="{{ exec["index"]|string+',state-exec-physical-class-'+loop.index|string }}">
+                                                            {% for resource_class in ["robot", "hardware", "human"] %}
+                                                                {% if executor["physical_resource_class"] == resource_class %}
+                                                                    <option value="{{ resource_class }}"
+                                                                            selected>{{ resource_class }}</option>
+                                                                {% else %}
+                                                                    <option value="{{ resource_class }}">{{ resource_class }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select></td>
+                                                        <td><select
+                                                                name="{{ exec["index"]|string+',state-exec-physical-name' }}"
+                                                                class="form-control name-col option"
+                                                                id="{{ exec["index"]|string+',state-exec-physical-name-'+loop.index|string }}"
+                                                                onchange="populateOptionsCyber({{ software_resource["software_choices"]|safe }}, this.id, this.value, , {{ loop.index }})">
+                                                            {% for resource in physical_resource[executor["physical_resource_class"]] %}
+                                                                {% if executor["physical_resource_name"] == resource["name"] %}
+                                                                    <option value="{{ resource["ID"] }}"
+                                                                            selected>{{ resource["name"] }}</option>
+                                                                {% else %}
+                                                                    <option value="{{ resource["ID"] }}">{{ resource["name"] }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select></td>
+                                                        <td><select
+                                                                name="{{ exec["index"]|string+',state-exec-software-name' }}"
+                                                                class="form-control name-col option"
+                                                                id="{{ exec["index"]|string+',state-exec-software-name-'+loop.index|string }}">
+                                                            {% for software in software_resource["software_choices"] %}
+                                                                {% if executor["physical_resource_id"] in software["physical_resource_id"] %}
+                                                                    {% if executor["cyber_resource_name"] == software["name"] %}
+                                                                        <option value="{{ software["ID"] }}"
+                                                                                selected>{{ software["name"] }}</option>
+                                                                    {% else %}
+                                                                        <option value="{{ software["ID"] }}">{{ software["name"] }}</option>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select></td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick="addExecutors({{ exec['index'] }}, {{ physical_resource|safe }}, {{ software_resource['software_choices']|safe }})">
+                                                            <i class="material-icons">add</i></button>
+                                                    </td>
+                                                </tr>
+                                                <tbody>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="3">
+                                                <button type="button"
+                                                        onclick='addStateExec({{ state_class|tojson|safe }}, {{ physical_resource|tojson|safe }}, {{ software_resource["software_choices"]|tojson|safe }})'
+                                                        class="btn btn-outline-info">
+                                                    <i class="material-icons">add</i></button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="grid-details">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2">blocker steps</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for condition in task_details["condition"] %}
+                                            {% if layer["step_cond_index"] == condition["index"] %}
+                                                {% for blockstep in task_details["isBlockedByStep"] %}
+                                                    {% if blockstep["index"] in condition["isBlockedByStep_index"] %}
+                                                        {% for step in task_details["step"] %}
+                                                            {% if step["index"] in blockstep["StepBlocker_index"] %}
+                                                                <tr>
+                                                                    <td><select class="form-control" name="StepBlocker">
+                                                                        <option value="{{ step["index"] }}">{{ step["sentence"] }}</option>
+                                                                        {% for step_option in task_details["step"] %}
+                                                                            {% if step_option["index"] != step["index"] %}
+                                                                                <option value="{{ step_option["index"] }}">{{ step_option["sentence"] }}</option>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-danger"
+                                                                                onclick="removeSelection(this)"><i
+                                                                                class="material-icons">delete</i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <tr>
+                                            <td colspan="2">
+                                                <button type="button" class="btn btn-outline-info"
+                                                        onclick='addSelect(this, {{ task_details["step"]|tojson }}, "StepBlocker", "StepBlocker")'>
+                                                    <i class="material-icons">add</i></button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="grid-details">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th>blocker states</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for condition in task_details["condition"] %}
+                                            {% if layer["step_cond_index"] == condition["index"] %}
+                                                {% for blockstate in task_details["isBlockedByState"] %}
+                                                    {% if blockstate["index"] in condition["isBlockedByState_index"] %}
+                                                        {% for state in task_details["state"] %}
+                                                            {% if state["index"] in blockstate["StateBlocker_index"] %}
+                                                                <tr>
+                                                                    <td><select class="form-control" name="StateBlocker">
+                                                                        <option value="{{ state["index"] }}">{{ state["var"] }}
+                                                                        {% for state_option in task_details["state"] %}
+                                                                            {% if state_option["index"] != state["index"] %}
+                                                                                <option value="{{ state_option["index"] }}">{{ state_option["var"] }}</option>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-danger"
+                                                                                onclick="removeSelection(this)"><i
+                                                                                class="material-icons">delete</i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <tr>
+                                            <td colspan="2">
+                                                <button type="button" class="btn btn-outline-info"
+                                                        onclick='addSelect(this, {{ task_details["state"]|tojson }}, "StateBlocker", "StateBlocker")'>
+                                                    <i class="material-icons">add</i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                 <div class="grid-details">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="4">prerequisite steps</th>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <th>set index</th>
+                                            <th>list</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                            {% for condition in task_details["condition"] %}
+                                                {% if layer["step_cond_index"] == condition["index"] %}
+                                                    {% for prereqstep in task_details["hasPrerequisiteStep"] %}
+                                                        {% if prereqstep["index"] in condition["hasPrerequisiteStep_index"] %}
+                                                            <tbody>
+                                                                {% for step in task_details["step"] %}
+                                                                    <tr>
+                                                                    {% if step["index"] in prereqstep["StepPrerequisite_index"] %}
+                                                                        {% if loop.index == 1 %}
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick='removeSet(this, "hasPrerequisiteStep", {{ prereqstep["index"] }})'>
+                                                                                    <i
+                                                                                            class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                            <td>{{ prereqstep["index"] }}</td>
+                                                                            <td><select class="form-control"
+                                                                                        name="{{ prereqstep["index"]|string+",hasPrerequisiteStep" }}">
+                                                                                <option value="{{ step["index"] }}">{{ step["sentence"] }}</option>
+                                                                                {% for step_option in task_details["step"] %}
+                                                                                    {% if step_option["index"] != step["index"] %}
+                                                                                        <option value="{{ step_option["index"]|string }}">{{ step_option["sentence"] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick="removeCondition(this)">
+                                                                                    <i class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        {% else %}
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td><select class="form-control"
+                                                                                        step="{{ prereqstep["index"]|string+",hasPrerequisiteStep" }}">
+                                                                                <option value="{{ step["index"] }}">{{ step["sentence"] }}</option>
+                                                                                {% for step_option in task_details["step"] %}
+                                                                                    {% if step_option["index"] != step["index"] %}
+                                                                                        <option value="{{ step_option["index"]|string }}">{{ step_option["sentence"] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick="removeCondition(this)">
+                                                                                    <i class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-info"
+                                                                                onclick='addSelectSet(this, {{ task_details["step"]|tojson }}, "hasPrerequisiteStep", {{ prereqstep["index"] }})'>
+                                                                            <i class="material-icons">add</i>
+                                                                        </button>
+                                                                    </td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                    </table>
+                                </div>
+                                <div class="grid-details">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="4">prerequisite states</th>
+                                        </tr>
+                                        <tr>
+                                            <th></th>
+                                            <th>set index</th>
+                                            <th>list</th>
+                                            <th></th>
+                                        </tr>
+                                        </thead>
+                                            {% for condition in task_details["condition"] %}
+                                                {% if layer["step_cond_index"] == condition["index"] %}
+                                                    {% for prereqstate in task_details["hasPrerequisiteState"] %}
+                                                        {% if prereqstate["index"] in condition["hasPrerequisiteState_index"] %}
+                                                            <tbody>
+                                                                {% for state in task_details["state"] %}
+                                                                    <tr>
+                                                                    {% if state["index"] in prereqstate["StatePrerequisite_index"] %}
+                                                                        {% if loop.index == 1 %}
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick='removeSet(this, "hasPrerequisiteState", {{ prereqstate["index"] }})'>
+                                                                                    <i class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                            <td>{{ prereqstate["index"] }}</td>
+                                                                            <td><select class="form-control"
+                                                                                        state="{{ prereqstate["index"]|string+",hasPrerequisiteState" }}">
+                                                                                <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                                {% for state_option in task_details["state"] %}
+                                                                                    {% if state_option["index"] != state["index"] %}
+                                                                                        <option value="{{ state_option["index"] }}">{{ state_option["var"] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick='removeCondition(this)'>
+                                                                                    <i
+                                                                                            class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        {% else %}
+                                                                            <td></td>
+                                                                            <td></td>
+                                                                            <td><select class="form-control"
+                                                                                        state="{{ prereqstate["index"]|string+",hasPrerequisiteState" }}">
+                                                                                <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                                {% for state_option in task_details["state"] %}
+                                                                                    {% if state_option["index"] != state["index"] %}
+                                                                                        <option value="{{ state_option["index"] }}">{{ state_option["var"] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick='removeCondition(this)'>
+                                                                                    <i
+                                                                                            class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        {% endif %}
+                                                                    {% endif %}
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                <tr>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-info"
+                                                                                onclick='addSelectSet(this, {{ task_details["state"]|tojson }}, "hasPrerequisiteState", {{ prereqstate["index"] }})'>
+                                                                            <i
+                                                                                    class="material-icons">add</i>
+                                                                        </button>
+                                                                    </td>
+                                                                    <td></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                    </table>
+                                </div>
+                                <div class="grid-details isachievedby">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="4">achieving conditions</th>
+                                        </tr>
+                                        {% for condition in task_details["condition"] %}
+                                            {% if layer["step_cond_index"] == condition["index"] %}
+                                                {% for isachieved in task_details["isAchievedBy"] %}
+                                                    {% if isachieved["index"] in condition["isAchievedBy_index"] %}
+                                                    <tbody>
+                                                    <tr>
+                                                        <th colspan="3">Set {{ loop.index }}</th>
+                                                        <th>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick='removeSet(this, "achieving conditions")'><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>prerequisite states set index</th>
+                                                        <th></th>
+                                                        <th>correct states</th>
+                                                        <th></th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <table class="table table-borderless">
+                                                                {% for prereqstate in task_details["hasPrerequisiteState"] %}
+                                                                    {% if prereqstate["index"] in isachieved["hasPrerequisiteState_index"] %}
+                                                                        <tr></tr>
+                                                                        <tr>
+                                                                            <td><select
+                                                                                    name="{{ loop.index|string+",isAchievedPreregstateset" }}"
+                                                                                    class="form-control Preregstateset">
+                                                                                <option value="{{ prereqstate["index"] }}">{{ prereqstate["index"] }}</option>
+                                                                                {% for state in task_details["hasPrerequisiteState"] %}
+                                                                                    {% if state["index"] != prereqstate["index"] %}
+                                                                                        <option value="{{ state["index"] }}">{{ state["index"] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick="removeCondition(this)">
+                                                                                    <i
+                                                                                            class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <tr>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-info"
+                                                                                onclick='addSelect(this, {{ task_details["hasPrerequisiteState"] }}, "isAchievedPreregstateset", {{ loop.index }})'>
+                                                                            <i class="material-icons">add</i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                        <td colspan="2">
+                                                            <table class="table table-borderless">
+                                                                {% for state in task_details["state"] %}
+                                                                    {% if state["index"] in isachieved["StateCorrect_index"] %}
+                                                                        <tr>
+                                                                            <td><select type="text"
+                                                                                        name="{{ loop.index|string+",isAchievedBy" }}"
+                                                                                        class="form-control">
+                                                                                <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                                {% for state_option in task_details["state"] %}
+                                                                                    {% if state_option["index"] != state["index"] %}
+                                                                                        <option value="{{ state_option["index"] }}">{{ state_option["var"] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-danger"
+                                                                                        onclick="removeCondition(this)">
+                                                                                    <i
+                                                                                            class="material-icons">delete</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <tr>
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-outline-info"
+                                                                                onclick='addSelect(this, {{ task_details["state"]|tojson }}, "isAchievedBy", {{ loop.index }})'>
+                                                                            <i
+                                                                                    class="material-icons">add</i>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="4">
+                                                <button type="button" class="btn btn-outline-info"
+                                                        onclick='addSetCorrect(this, {{ task_details["hasPrerequisiteState"]|tojson }}, {{ task_details["state"]|tojson }})'>
+                                                    <i class="material-icons">add</i></button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="grid-details isfailedby">
+                                   <table class="table table-borderless">
+                                        <thead>
+                                            <tr>
+                                                <th colspan="8">failing conditions</th>
+                                            </tr>
+                                        </thead>
+                                        {% for condition in task_details["condition"] %}
+                                            {% if layer["step_cond_index"] == condition["index"] %}
+                                                {% for isfailedby in task_details["isFailedByState"] %}
+                                                    {% if isfailedby["index"] in condition["isFailedByState_index"] %}
+                                                        <tbody>
+                                                            <tr>
+                                                                <th colspan="6">Set {{ loop.index }}</th>
+                                                                <th colspan="2">
+                                                                    <button type="button" class="btn btn-outline-danger"
+                                                                            onclick="removeSet(this)"><i
+                                                                            class="material-icons">delete</i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>prerequisite states set index</th>
+                                                                <th></th>
+                                                                <th>Failed State</th>
+                                                                <th></th>
+                                                                <th>correct states</th>
+                                                                <th></th>
+                                                                <th>return to step</th>
+                                                                <th></th>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="2">
+                                                                    <table class="table table-borderless">
+                                                                        {% for prereqstate in task_details["hasPrerequisiteState"] %}
+                                                                            {% if prereqstate["index"] in isfailedby["hasPrerequisiteState_index"] %}
+                                                                                <tr>
+                                                                                    <td><select
+                                                                                            name="{{ loop.index|string+",isFailedPreregstateset" }}"
+                                                                                            class="form-control Preregstateset">
+                                                                                        <option value="{{ prereqstate["index"] }}">{{ prereqstate["index"] }}</option>
+                                                                                        {% for state_option in task_details["hasPrerequisiteState"] %}
+                                                                                            {% if state_option["index"] != prereqstate["index"] %}
+                                                                                                <option value="{{ state_option["index"] }}">{{ state_option["index"] }}</option>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select></td>
+                                                                                    <td>
+                                                                                        <button type="button"
+                                                                                                class="btn btn-outline-danger"
+                                                                                                onclick="removeCondition(this)">
+                                                                                            <i
+                                                                                                    class="material-icons">delete</i>
+                                                                                        </button>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                    </table>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <table class="table table-borderless">
+                                                                        {% for state in task_details["state"] %}
+                                                                            {% if state["index"] in isfailedby["StateWrong_index"] %}
+                                                                                <tr>
+                                                                                    <td><select
+                                                                                            name="{{ loop.index|string+",isFailedByState" }}"
+                                                                                            class="form-control">
+                                                                                        <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                                        {% for state_option in task_details["state"] %}
+                                                                                            {% if state_option["index"] != state["index"] %}
+                                                                                                <option value="{{ state_option["index"] }}">{{ state_option["var"] }}</option>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select></td>
+                                                                                    <td>
+                                                                                        <button type="button"
+                                                                                                class="btn btn-outline-danger"
+                                                                                                onclick="removeCondition(this)">
+                                                                                            <i
+                                                                                                    class="material-icons">delete</i>
+                                                                                        </button>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-info"
+                                                                                        onclick='addSelect(this, {{ task_details["state"]|tojson }}, "isFailedByState", {{ loop.index }})'>
+                                                                                    <i
+                                                                                            class="material-icons">add</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <table class="table table-borderless">
+                                                                        {% for state in task_details["state"] %}
+                                                                            {% if state["index"] in isfailedby["StateCorrect_index"] %}
+                                                                                <tr>
+                                                                                    <td><select
+                                                                                            name="{{ loop.index|string+",isFailedIf" }}"
+                                                                                            class="form-control">
+                                                                                        <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                                        {% for state_option in task_details["state"] %}
+                                                                                            {% if state_option["index"] != state["index"] %}
+                                                                                                <option value="{{ state_option["index"] }}">{{ state_option["var"] }}</option>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select></td>
+                                                                                    <td>
+                                                                                        <button type="button"
+                                                                                                class="btn btn-outline-danger"
+                                                                                                onclick="removeCondition(this)">
+                                                                                            <i
+                                                                                                    class="material-icons">delete</i>
+                                                                                        </button>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-info"
+                                                                                        onclick='addSelect(this, {{ task_details["state"]|tojson }}, "isFailedIf", {{ loop.index }})'>
+                                                                                    <i
+                                                                                            class="material-icons">add</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                                <td colspan="2">
+                                                                    <table class="table table-borderless">
+                                                                        {% for step in task_details["step"] %}
+                                                                            {% if step["index"] in isfailedby["StepReturn_index"] %}
+                                                                                <tr>
+                                                                                    <td><select
+                                                                                            name="{{ loop.index|string+",StepReturn" }}"
+                                                                                            class="form-control">
+                                                                                        <option value="{{ step["index"] }}">{{ step["sentence"] }}</option>
+                                                                                        {% for step_option in task_details["step"] %}
+                                                                                            {% if step_option["index"] != step["index"] %}
+                                                                                                <option value="{{ step_option["index"] }}">{{ step_option["sentence"] }}</option>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                    </select></td>
+                                                                                    <td>
+                                                                                        <button type="button"
+                                                                                                class="btn btn-outline-danger"
+                                                                                                onclick="removeCondition(this)">
+                                                                                            <i
+                                                                                                    class="material-icons">delete</i>
+                                                                                        </button>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endif %}
+                                                                        {% endfor %}
+                                                                        <tr>
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-outline-info"
+                                                                                        onclick='addSelect(this, {{ task_details["step"]|tojson }}, "StepReturn", {{ loop.index }})'>
+                                                                                    <i class="material-icons">add</i>
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endfor %}
+                                       <tbody>
+                                       <tr>
+                                           <td colspan="8">
+                                               <button type="button" class="btn btn-outline-info"
+                                                       onclick='addSetFail(this, {{ task_details["hasPrerequisiteState"]|tojson }}, {{ task_details["state"]|tojson }}, {{ task_details["step"]|tojson }})'>
+                                                   <i
+                                                           class="material-icons">add</i></button>
+                                           </td>
+                                       </tr>
+                                       </tbody>
+                                   </table>
+                                </div>
+                                <div class="grid-details location-id">
+                                    <table class="table table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2">Location ID</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for location_id in layer["location_id"] %}
+                                            <tr>
+                                                <td><select class="form-control" name="location_id">
+                                                    <option value="{{ location_id }}">{{ location_id }}</option>
+                                                    {% for location in location_resource %}
+                                                        {% if location_id != location %}
+                                                            <option value="{{ location }}">{{ location }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick="removeCondition(this)"><i class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td colspan="2">
+                                                <button type="button" class="btn btn-outline-info"
+                                                        onclick='addSelect(this, {{ location_resource }}, "location_id", "location_id")'>
+                                                    <i class="material-icons">add</i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% set ns.previous = "objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int)|string %}
+                        {% for prev in task_details[ns.previous] %}
+                            {% if layer["index"] in prev["content_index"] %}
+                                {% set ns.previous_index = prev["index"]|string %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% if ns.layer == "objective_layer_1" %}
+                        {% set ns.layer = "step" %}
+                    {% else %}
+                        {% set ns.layer = "objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int - 1)|string %}
+                    {% endif %}
+                    {% set ns.previous_layer = "Objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int)|string %}
+                {% endfor %}
+            </div>
+            {% include "tree_edit.html" %}
+        </div>
+        <div class="modal fade" id="delete-task" tabindex="-1"
+             role="dialog"
+             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        Confirm deletion of {{ task_details["task"]["sentence"] }}? <br>This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close
+                        </button>
+                        <button type="submit" class="btn btn-danger"
+                                name="delete" value="/">Confirm Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/processes/edit_process.js") }}"></script>
+    <script>
+        var index_dict = {{ index_dict|tojson }};
+    </script>
+{% endblock %}
+

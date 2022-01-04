@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Add steps to New action Definition</h1>
+    <p class="lead">
+        Please add the appropriate steps to the action definition
+    </p>
+</div>
+<div class="container">
+    <h1 class="display-10">Add step for: {{ action_sentence }}</h1>
+</div>
+<form method='POST' business=''>
+    <div class="container" style="text-align:left">
+        {{ form.csrf_token() }}
+        {% from "includes/_formhelpers.html" import render_field %}
+        {% for step_entry_form in form.step_list %}
+        <div class="form-group">
+            {{ render_field(step_entry_form, class_="form-control") }}
+        </div>
+        {% endfor %}
+    </div>
+    {{ form.hidden_tag() }}
+    <p>
+        <button class="btn btn-secondary" name="add_step" value="add" style="width:20%">Add Step</button>
+        <button class="btn btn-secondary" name="add_step" value="subtract" style="width:20%">Remove Step</button>
+    </p>
+    <p><button class="btn btn-primary" name="add_step" value="submit" style="width:40%">Submit</button></p>
+</form>
+{% endblock %}

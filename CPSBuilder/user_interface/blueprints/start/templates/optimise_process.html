@@ -1,0 +1,181 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/start/optimise_process.css') }}">
+{% extends 'layout.html' %}
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Optimise
+            Process: {{ session["new_job"]["job_list"][number|int]["task_details"]["task"]["sentence"] }}</h1>
+        <p class="lead">
+            Optimise the selected process for the job
+        </p>
+    </div>
+    <div id="all-list-button">
+        <a href="{{ url_for("start.optimise", job_name=session["new_job"]["job_name"])}}"><span id="back-icon" class="material-icons">navigate_before</span><span id="back-name">Job List</span></a>
+    </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div id="optimise-process-page">
+            <div class="tree-content">
+                <div class="row-tree">
+                    <p class="layer-heading">task</p>
+                    {% if session["new_job"]["job_list"][number|int]["task_details"]["task"]["status"] %}
+                        <div class="tree-detail optimised" id="task-0">
+                            <p>{{ session["new_job"]["job_list"][number|int]["task_details"]["task"]["sentence"] }}</p>
+                        </div>
+                    {% else %}
+                        <div class="tree-detail not-optimised" id="task-0">
+                            <p>{{ session["new_job"]["job_list"][number|int]["task_details"]["task"]["sentence"] }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                {% set ns = namespace(layer="task", next=session["new_job"]["job_list"][number|int]["task_details"]["task"]["content_layer"]) %}
+                {% for num in range(0, session["new_job"]["job_list"][number|int]["task_details"]["task"]["layer_no"]) %}
+                    {% if ns.layer == "task" %}
+                        <div class="row-tree tosort">
+                            <p class="replace-underscore layer-heading">{{ ns.next }}</p>
+                            {% for detail in session["new_job"]["job_list"][number|int]["task_details"][ns.next] %}
+                                {% if detail["index"] in session["new_job"]["job_list"][number|int]["task_details"]["task"]["content_index"] %}
+                                    {% if detail["status"] %}
+                                        <div class="tree-detail optimised"
+                                             id="{{ ns.next|string + "-" + detail["index"]|string }}">
+                                            <p>{{ detail["sentence"] }}</p>
+                                        </div>
+                                        <svg class="svg">
+                                            <line class="line"
+                                                  id="{{ "task-0," + ns.next|string + "-" + detail["index"]|string }}"/>
+                                        </svg>
+                                    {% else %}
+                                        <div class="tree-detail not-optimised"
+                                             id="{{ ns.next|string + "-" + detail["index"]|string }}">
+                                            <p>{{ detail["sentence"] }}</p>
+                                        </div>
+                                        <svg class="svg">
+                                            <line class="line"
+                                                  id="{{ "task-0," + ns.next|string + "-" + detail["index"]|string }}"/>
+                                        </svg>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="row-tree tosort">
+                            <p class="replace-underscore layer-heading">{{ ns.next }}</p>
+                            {% for parent in session["new_job"]["job_list"][number|int]["task_details"][ns.layer] %}
+                                {% for detail in session["new_job"]["job_list"][number|int]["task_details"][ns.next] %}
+                                    {% if detail["index"] in parent["content_index"] %}
+                                        {% if detail["status"] %}
+                                            {% if ns.next == "step" %}
+                                                <div class="tree-detail optimised"
+                                                     id="{{ ns.next|string + "-" + detail["index"]|string }}"
+                                                     onmouseout="closeOptions(this)" onmouseover="seeOptions(this)">
+                                                    <p>{{ detail["sentence"] }}</p>
+                                                    <button class="btn btn-info"
+                                                            type="submit"
+                                                            name="optimise"
+                                                            value="{{ detail["index"] }}">Optimise
+                                                    </button>
+                                                    <button class="btn btn-light"
+                                                            type="button" data-toggle="modal"
+                                                            data-target="{{ "#reset"+loop.index0|string }}"
+                                                            name="reset" value="{{ detail["index"] }}">Reset
+                                                    </button>
+                                                </div>
+                                                <div class="modal fade" id="{{ "reset"+loop.index0|string }}"
+                                                     tabindex="-1"
+                                                     role="dialog"
+                                                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-body">
+                                                                This will undo changes for this step, are you sure?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">Close
+                                                                </button>
+                                                                <button type="submit" class="btn btn-light"
+                                                                        name="reset" value="{{ detail["index"] }}">
+                                                                    Reset
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="tree-detail optimised"
+                                                     id="{{ ns.next|string + "-" + detail["index"]|string }}">
+                                                    <p>{{ detail["sentence"] }}</p>
+                                                </div>
+                                            {% endif %}
+                                            <svg class="svg">
+                                                <line class="line"
+                                                      id="{{ ns.layer|string + "-" + parent["index"]|string + "," + ns.next|string + "-" + detail["index"]|string }}"></line>
+                                            </svg>
+                                        {% else %}
+                                            {% if ns.next == "step" %}
+                                                <div class="tree-detail not-optimised"
+                                                     id="{{ ns.next|string + "-" + detail["index"]|string }}" onmouseout="closeOptions(this)" onmouseover="seeOptions(this)">
+                                                    <p>{{ detail["sentence"] }}</p>
+                                                    <button class="btn btn-info"
+                                                            type="submit"
+                                                            name="optimise"
+                                                            value="{{ detail["index"] }}">Optimise</button>
+                                                    <button class="btn btn-primary"
+                                                            type="submit" name="assigned" value="{{ detail["index"] }}">Use Assigned</button>
+                                                </div>
+                                                <div class="modal fade" id="{{ "location"+loop.index0|string }}"
+                                                     tabindex="-1"
+                                                     role="dialog"
+                                                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-body">
+                                                                <h1>List of location to execute {{ detail["sentence"] }}</h1>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">Close
+                                                                </button>
+                                                                <button type="submit" class="btn btn-light"
+                                                                        name="reset" value="{{ detail["index"] }}">
+                                                                    Reset
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="tree-detail not-optimised">
+                                                    <p id="{{ ns.next|string + "-" + detail["index"]|string }}">{{ detail["sentence"] }}</p>
+                                                </div>
+                                            {% endif %}
+                                            <svg class="svg">
+                                                <line class="line"
+                                                      id="{{ ns.layer|string +"-"+parent["index"]|string + "," + ns.next|string + "-" + detail["index"]|string }}"></line>
+                                            </svg>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if ns.layer == "task" %}
+                        {% set ns.layer = session["new_job"]["job_list"][number|int]["task_details"]["task"]["content_layer"] %}
+                        {% if ns.next == "objective_layer_1" %}
+                            {% set ns.next = "step" %}
+                        {% else %}
+                            {% set ns.next = "objective_layer_" + (session["new_job"]["job_list"][number|int]["task_details"]["task"]["content_layer"][16:]|int - num|int - 1)|string %}
+                        {% endif %}
+                    {% else %}
+                        {% set ns.layer = "objective_layer_" + (session["new_job"]["job_list"][number|int]["task_details"]["task"]["content_layer"][16:]|int - num|int)|string %}
+                        {% if ns.next == "objective_layer_1" %}
+                            {% set ns.next = "step" %}
+                        {% else %}
+                            {% set ns.next = "objective_layer_" + (session["new_job"]["job_list"][number|int]["task_details"]["task"]["content_layer"][16:]|int - num|int - 1)|string %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/start/optimise_process.js") }}"></script>
+{% endblock %}

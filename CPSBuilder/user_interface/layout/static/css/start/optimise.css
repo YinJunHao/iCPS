@@ -1,0 +1,86 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "optimise.html"
+ * Written by Yin Jun Hao
+*/
+
+/*optimise.html*/
+#optimise-job-page {
+    /*display: flex;*/
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.cover-heading {
+    text-transform: capitalize;
+}
+.header {
+    text-align: center;
+}
+#job-list {
+    width: 20%;
+    border-right: 2px solid black;
+    height: 50px;
+}
+.job-list {
+    text-align: center;
+}
+.individual-process {
+    display: flex;
+    justify-content: center;
+}
+#optimise-job {
+    width: 70%;
+}
+#caption-for-optimise-table {
+    text-transform: capitalize;
+    padding-bottom: 1rem;
+}
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.optimise-button button {
+    font-size: 1.5rem;
+    width: 11rem;
+}
+
+th {
+    background: #303030;
+    color: white;
+    height: 3rem;
+    font-size: 1.5rem;
+}
+span {
+   cursor: pointer;
+}
+td{
+    height: 5rem;
+    font-weight: 400;
+    font-size: 1.5rem;
+}
+
+.status-optimise {
+    font-weight: bold;
+    color: #007E33;
+}
+
+.status-not-optimise {
+    font-weight: bold;
+    color: #FF8800;
+}
+
+#confirmed-button {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+}
+
+#unconfirmed-button {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+    cursor: not-allowed;
+}

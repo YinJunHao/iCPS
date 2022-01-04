@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Register New action</h1>
+    <p class="lead">
+        Enter the name of the action you wish to add.
+    </p>
+</div>
+<div class="container">
+    <h3 class="display-10">Add Action for Task: {{ task_sentence }}</h3>
+</div>
+<form method='POST'>
+    <div class="container" style="text-align:left; max-width: 475px">
+        {{ new_action_form.csrf_token() }}
+        {% from "includes/_formhelpers.html" import render_field %}
+        {% for action_entry_form in new_action_form.action_list %}
+        <div class="form-group">
+            {{ render_field(action_entry_form, class_="form-control") }}
+        </div>
+        {% endfor %}
+    </div>
+    {{ new_action_form.hidden_tag() }}
+    <p>
+        <button class="btn btn-secondary" name="add_action" value="add" style="width:20%">Add Action</button>
+        <button class="btn btn-secondary" name="add_action" value="subtract" style="width:20%">Remove Action</button>
+    </p>
+    <p><button class="btn btn-primary" name="add_action" value="submit" style="width:40%">Submit</button></p>
+</form>
+{% endblock %}

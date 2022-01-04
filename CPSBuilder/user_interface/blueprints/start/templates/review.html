@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Review</h1>
+        <p class="lead">
+            Review the specifications before submitting the job
+        </p>
+    </div>
+    <div class="container">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <button type="submit" name="submit" value="/" class="btn btn-success btn-block">Submit Job</button>
+        </form>
+    </div>
+{% endblock %}

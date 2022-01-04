@@ -1,0 +1,29 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "confimation.html" tab
+ * Written by Yin Jun Hao
+*/
+
+#confirmation-page {
+    text-align: center;
+    margin-top: 20rem;
+    margin-bottom: 20rem;
+}
+
+#confirmation-page h1 {
+    font-size: 7rem;
+}
+
+#confirmation-page p {
+    font-size: 3rem;
+}
+
+#confirmation-page button {
+    font-size: 2rem;
+    width: 20rem;
+}
+
+#confirm-icon {
+    fill: #007E33; !important;
+}

@@ -1,0 +1,40 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * Thi script governs all the styles for the "register.html"
+ * Written by Yin Jun Hao
+*/
+
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+.register-page {
+    font-size: 5rem;
+    max-width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-group {
+    font-size: 5rem;
+    padding-bottom: 0.5rem;
+}
+
+input:focus {
+    border-bottom: 0.5rem solid dodgerblue;
+}
+.register-page a, .register-page input, .register-page select, .register-page option, .register-page button {
+    font-size: 1.5rem;
+}
+
+.log-in {
+    padding-top: 1.5rem;
+}
+.alert {
+    font-size: 2rem;
+}
+.alert span {
+    font-size: 2.5rem;
+}

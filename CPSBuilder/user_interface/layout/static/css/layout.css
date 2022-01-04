@@ -1,0 +1,147 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the layout
+ * Written by Yin Jun Hao
+*/
+
+/*layout.html*/
+
+* {
+    font-size: 62.5%;
+}
+body {
+    /*background: linear-gradient(to right, #4b79a1, #283e51);*/
+}
+button:focus {
+    outline: none;
+}
+
+/*Navbar Styling*/
+.navbar-custom {
+    background: #003366;
+    height: 10rem;
+    padding-left: 3rem;
+}
+.navbar-brand {
+    font-weight: bold;
+    color: #f8f8ff;
+    font-size: 3.5rem;
+    height: 10rem;
+    line-height: 10rem;
+}
+
+.navbar-brand:hover {
+    color: white;
+}
+.nav-item {
+    padding-left: 2rem;
+}
+
+.nav-item a {
+    color: #f8f8ff;
+    font-size: 2.5rem;
+    height: 10rem;
+    line-height: 10rem
+}
+
+
+.nav-item a:hover {
+    color: white;
+    border-bottom: 1rem solid white;
+}
+#user {
+    margin-right: 3rem;
+    color: #f8f8ff;
+    font-size: 2.5rem;
+    height: 10rem;
+    line-height: 10rem
+}
+#user:hover {
+    color: white;
+    border-bottom: 1rem solid white;
+}
+
+
+.dropdown-menu a {
+    color: black;
+    font-size: 2rem;
+    padding: 2rem 1rem;
+}
+.dropdown-menu a:hover {
+    background: #f8f8ff;
+}
+
+.logout-modal {
+    font-size: 2rem;
+}
+.btn-warning.custom-btn {
+    color: white;
+}
+
+.modal-body {
+    font-size: 2rem;
+}
+.modal-footer button, .modal-footer a {
+    font-size: 2rem;
+}
+.login {
+    line-height: 10rem;
+    padding: 0 1rem;
+}
+.login a {
+    font-size: 2.5rem;
+
+}
+
+/*Styling for other pages*/
+body {
+/*    set background styling*/
+}
+
+#back {
+    position: absolute;
+    top: 18rem;
+    right: 2rem;
+    width: 7rem;
+    height: 4rem;
+}
+#back i {
+    padding-bottom: 2rem;
+}
+.header {
+    height: 15rem;
+    padding: 1rem;
+    font-size: 5rem;
+    /*border-bottom: 1px solid black;*/
+    /*text-align: center;*/
+}
+
+.header h1 {
+    font-size: 5rem;
+}
+ .header p {
+     font-size: 2rem;
+ }
+.container {
+    padding-top: 1rem;
+}
+
+.form {
+    border-radius: 0.4rem;
+    border: 0.1rem solid #ccc;
+    margin: 0rem 0.5rem;
+}
+
+
+footer {
+    width: 100%;
+    padding-top: 5rem;
+    text-align: center;
+}
+
+#footer-brand {
+    font-size: 2rem;
+    font-weight: 300;
+}
+

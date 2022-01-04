@@ -1,0 +1,12 @@
+.navbar-custom {
+    background: #003366;
+}
+
+.nav-link {
+    font-weight: bold;
+    color: #e6e6e6;
+}
+
+.nav-link:hover {
+    color: white;
+}

@@ -1,0 +1,54 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "start" tab
+ * Written by Yin Jun Hao
+*/
+
+/*system_start.html*/
+#start-page {
+    display: flex;
+    padding: 20px;
+}
+.cover-heading {
+    text-transform: capitalize;
+}
+.avail-task {
+    width: 50%;
+}
+
+.avail-task-details {
+    border: 2px solid black;
+    height: 400px;
+}
+.task-details {
+    padding: 10px;
+    display: none;
+}
+.task-details h5 {
+    text-align: center;
+}
+.new-job {
+    width: 50%;
+}
+
+/*optimise.html*/
+#optimise-job-page {
+    display: flex;
+}
+
+#job-list {
+    width: 20%;
+    border-right: 2px solid black;
+    height: 50px;
+}
+.job-list {
+    text-align: center;
+}
+.individual-process {
+    display: flex;
+    justify-content: center;
+}
+#optimise-job {
+    width: 70%;
+}

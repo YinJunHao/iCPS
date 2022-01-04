@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Register New Executor</h1>
+    <p class="lead">
+        Enter the name of the executor you wish to add to the action.
+    </p>
+</div>
+<div class="container" style="text-align: left">
+    <h1 class="lead"><b>Action being added to: </b>{{ step_sentence }}</h1>
+</div>
+<div class="container">
+    <form method='POST' business=''>
+        <div class="container" style="text-align: left">
+            {{ exec_list_form.csrf_token() }}
+            {% from "includes/_formhelpers.html" import render_field %}
+            <div class="container">
+                {{ render_field(exec_list_form.exec_class, class_="form-control") }}
+                {{ render_field(exec_list_form.exec_type, class_="form-control") }}
+                {{ render_field(exec_list_form.dependency, class_="form-control") }}
+                {{ render_field(exec_list_form.software, class_="form-control") }}
+            </div>
+        </div>
+        <!-- <div class="container" style="text-align: center">
+            {{ add_remove_software.add_software(style="width: 40%;", class_="btn btn-seconday") }}
+            {{ add_remove_software.remove_software(style="width: 40%;", class_="btn btn-secondary") }}
+        </div> -->
+        <div class="container">
+            {{ submit_exec_form.submit_exec(style="width: 80%;", class_="btn btn-primary") }}
+        </div>
+    </form>
+    {% include 'includes/_messages.html' %}
+</div>
+{% endblock %}

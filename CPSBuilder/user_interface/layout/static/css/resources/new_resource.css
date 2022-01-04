@@ -1,0 +1,184 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "new_resource.html"
+ * Written by Yin Jun Hao
+*/
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.header h1 {
+    text-transform: capitalize;
+}
+
+
+/*new_resource.html*/
+#draft-page {
+    position: absolute;
+    width: 15%;
+    text-align: center;
+    height: 100%;
+    border-right: .1rem solid darkgrey;
+    top: 10rem
+}
+.draft-header {
+    width: 100%;
+    background: #0052A1;
+    color: white;
+    margin: 0;
+    font-size: 2rem;
+}
+
+.draft {
+    border-bottom: .1rem solid darkgrey;
+    background: #CAD1DC;
+    font-size: 2.5rem;
+    padding-bottom: 1rem;
+}
+.draft:hover  {
+    cursor: pointer;
+    background: #2761b2;
+    color: white;
+    visibility: visible;
+}
+.draft:hover .draft-actions {
+    visibility: visible;
+}
+.draft-details {
+    display: inline-block;
+    text-align: center;
+    padding-right: 0.5rem;
+}
+
+.draft-actions {
+    display: inline-block;
+    text-align: center;
+    padding-top: 1rem;
+    visibility: hidden;
+}
+
+#add-page {
+    width: 45%;
+}
+
+
+#add-page dt {
+    font-size: 3rem;
+}
+
+#add-page input, #add-page select, #add-page option  {
+    font-size: 1.5rem;
+}
+#add-page input {
+    margin-right: 1rem;
+}
+
+.form-inline input,
+.form-inline label {
+    font-size: 2rem;
+}
+
+.label-header {
+    font-weight: 700;
+    padding-top: 1rem;
+    font-size: 1.9rem;
+}
+
+.sub-label {
+    margin-right: 1.5rem;
+}
+
+.add-variable {
+    color: #0275d8;
+    cursor: pointer;
+}
+.remove-variable {
+    color: #d9534f;
+    cursor: pointer;
+    padding: 1rem;
+}
+
+.new-variable {
+    display: flex;
+}
+
+#params dd,
+#states dd {
+    width: 80%;
+}
+
+.add-actions {
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.add-actions button {
+    width: 30rem;
+    font-size: 1.5rem;
+}
+
+.btn-outline-warning.custom-btn:hover {
+    color:white;
+    width: 30rem;
+    font-size: 1.5rem;
+}
+
+.alert {
+    font-size: 2rem;
+}
+
+.alert span {
+    font-size: 2.5rem;
+}
+
+#physical-resource-for-software {
+    padding-top: 2rem;
+}
+#table {
+    width: 90%
+}
+.table{
+    margin-top: 1rem;
+    table-layout: fixed;
+}
+.delete-column {
+    width: 4rem;
+}
+.physical-resource-for-software th{
+    font-size: 1.25rem;
+    text-align: center;
+}
+.physical-resource-for-software option,
+.physical-resource-for-software select {
+    text-transform: capitalize;
+}
+
+.physical-delete {
+    column-width: 4rem;
+}
+
+#help-row {
+    display: flex;
+}
+
+#location-reference-icon {
+    margin-left: auto;
+    padding-top: 1rem;
+    cursor: pointer;
+}
+#location-reference-heading {
+    text-align: center;
+    font-size: 3rem;
+}
+#location-reference-picture {
+    width: 75rem;
+}
+
+.position {
+    padding-bottom: 2rem;
+}

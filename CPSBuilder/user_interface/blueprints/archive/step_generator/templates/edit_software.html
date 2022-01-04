@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Edit Software</h1>
+    <p class="lead">
+        Choose which software you prefer to execute the step
+    </p>
+</div>
+{% from "includes/_formhelpers.html" import render_field %}
+<div class="container" style="align-content: center">
+    <h3 class="cover-heading">Step Chosen: {{ step_sentence }}</h3>
+    <form method='POST' business=''>
+        {{ change_software_form.csrf_token() }}
+        <div class="container" style="text-align: left">
+            <table class="table-striped" style="width: 100%;">
+                <tr>
+                    <th class="index"></th>
+                    <th class="content">ID</th>
+                    <th class="content">Name</th>
+                    <th class="content">Input</th>
+                    <th class="content">Output</th>
+                </tr>
+                {% for subfield in change_software_form.new_software %}
+                <tr>
+                    <td class="index"><label> {{ subfield }} </label></td>
+                    <td class="content">{{ software_list[loop.index0]['id'] }}</td>
+                    <td class="content">{{ software_list[loop.index0]['name'] }}</td>
+                    <td class="content">{{ software_list[loop.index0]['input'] }}</td>
+                    <td class="content">{{ software_list[loop.index0]['output'] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <p>
+            {{ submit_cancel_form.accept(class_="btn btn-primary", style="width:40%") }}
+            {{ submit_cancel_form.cancel(class="btn btn-secondary", style="width:40%") }}
+        </p>
+    </form>
+    {% include 'includes/_messages.html' %}
+</div>
+{% endblock %}

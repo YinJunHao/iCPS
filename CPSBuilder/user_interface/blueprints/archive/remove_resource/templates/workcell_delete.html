@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Manage Workcell</h1>
+    <p class="lead">
+        Choose workcell components to delete or add new workcell details with the button
+    </p>
+</div>
+<div class="container">
+    <h1 class="display-10">Resource Available:</h1>
+</div>
+{% from "includes/_formhelpers.html" import render_field %}
+<div class="container" style="align-content: center">
+    <form method='POST' business=''>
+        {{ workcell_list_form.csrf_token() }}
+        <div class="container" style="text-align: left">
+            <table class="table-striped" style="width:100%">
+                <tr>
+                    <th class="index"></th>
+                    <th class="content">ID</th>
+                    <th class="content">Workcell ID</th>
+                    <th class="content">Component Name</th>
+                    <th class="content">Coordinates</th>
+                    <th class="content">Last Update</th>
+                    <th class="content">See Equipments</th>
+                    <th class="content">Edit</th>
+                </tr>
+
+                {% for subfield in workcell_list_form.workcell_list %}
+                <tr>
+                    {% if session['is_admin'] %}
+                    <td class="index"><label> {{ subfield }} </label></td>
+                    {% else %}
+                    <td class="index"><label>{{ loop.index }}</label></td>
+                    {% endif %}
+                    <td class="content">{{ workcell_db_curs[loop.index0]['location_id'] }}</td>
+                    <td class="content">{{ workcell_db_curs[loop.index0]['workcell_id'] }}</td>
+                    <td class="content">{{ workcell_db_curs[loop.index0]['location_name'] }}</td>
+                    {% if workcell_db_curs[loop.index0]['coordinate'] is defined %}
+                    <td class="content">
+                        <table class="table-striped" style="width: 100%;" align="center">
+                            <tr>
+                                <th class="index">x</th>
+                                <td class="content">{{ workcell_db_curs[loop.index0]['coordinate']['x_min'] }}m : {{
+                                    workcell_db_curs[loop.index0]['coordinate']['x_max'] }}m
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="index">y</th>
+                                <td class="content">{{ workcell_db_curs[loop.index0]['coordinate']['y_min'] }}m : {{
+                                    workcell_db_curs[loop.index0]['coordinate']['y_max'] }}m
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="index">z</th>
+                                <td class="content">{{ workcell_db_curs[loop.index0]['coordinate']['z_min'] }}m : {{
+                                    workcell_db_curs[loop.index0]['coordinate']['z_max'] }}m
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    {% else %}
+                    <td class="content"></td>
+                    {% endif %}
+                    <td class="content">{{ workcell_db_curs[loop.index0]['last_update'] }}</td>
+                    <td class="content">
+                        <button class="btn btn-secondary" style="width:100%" name="equipment_details"
+                                value="{{ workcell_db_curs[loop.index0]['location_id'] }}">Equipment Details
+                        </button>
+                    </td>
+                    <td class="content">
+                        <button class="btn btn-primary" name="edit_resource"
+                                value="{{ workcell_db_curs[loop.index0]['location_id'] }}"
+                                style="width:100%">Edit
+                        </button>
+                    </td>
+                </tr>
+
+                {% endfor %}
+            </table>
+        </div>
+        {% if session['is_admin'] %}
+        <p>
+            <button class="btn btn-secondary" style="width: 25%" name="del_resource" value="clear_selection">Clear
+                Selection
+            </button>
+            <a class="btn btn-primary" style="width: 25%" href="{{ url_for('new_resource.enter_workcell') }}">Add New
+                Resource</a>
+            <button class="btn btn-danger" style="width: 25%" name="del_resource" value="delete">Delete Resources
+            </button>
+        </p>
+    </form>
+    {% endif %}
+
+    {% include 'includes/_messages.html' %}
+</div>
+
+
+{% endblock %}

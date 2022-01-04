@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">iCPS Optimizer</h1>
+    <p class="lead">
+        iCPS finds and suggests to user optimized manufacturing methods
+        in compliance with CGMP and ISO rulings.
+    </p>
+</div>
+<div class="container" style="align-self: center; align-content: center">
+    <form method="POST">
+        <div class="container" style="width: 60%; align-self: center; align-content: center" )>
+            <table class="table-striped" style="width: 100%;" align="center">
+                {{ edit_hardware_form.csrf_token() }}
+                <tr>
+                    <th class="index"></th>
+                    <th class="content">Category</th>
+                    <th class="content"></th>
+                    <th class="content" style="text-align: center">Edit</th>
+                </tr>
+                <tr>
+                    <td class="index">1</td>
+                    <td class="content">ID</td>
+                    <td class="content">{{ equipment_details['ID'] }}</td>
+                    <td class="content"></td>
+                </tr>
+                <tr>
+                    <td class="index">2</td>
+                    <td class="content">Name</td>
+                    <td class="content">{{ equipment_details['name'] }}</td>
+                    <td class="content">
+                        {{ edit_hardware_form.hardware_name(class_="form-control", style="text-align: left", value=equipment_details['name']) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="index">3</td>
+                    <td class="content">Item Type</td>
+                    <td class="content">{{ equipment_details['item_type'] }}</td>
+                    <td class="content">
+                        {{ edit_hardware_form.hardware_type(class_="form-control", style="text-align: left") }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="index">4</td>
+                    <td class="content">Pos Tag ID</td>
+                    {% if equipment_details.coordinate is defined %}
+                    <td class="content">{{ equipment_details['coordinate']['position_sensor_tag'] }}</td>
+                    <td class="content">
+                        {{ edit_hardware_form.position_sensor_tag(class_="form-control", style="text-align: left", value=equipment_details['coordinate']['position_sensor_tag']) }}
+                    </td>
+                    {% else %}
+                    <td class="content"></td>
+                    <td class="content">
+                        {{ edit_hardware_form.position_sensor_tag(class_="form-control", style="text-align: left") }}
+                    </td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td class="index">5</td>
+                    <td class="content">Location ID</td>
+                    <td class="content">{{ equipment_details['location_id'] }}</td>
+                    <td class="content">
+                        {{ edit_hardware_form.location_id(class_="form-control", style="text-align: left", value=equipment_details['location_id']) }}
+                    </td>
+                </tr>
+            </table>
+            {% from "includes/_formhelpers.html" import render_field %}
+
+            {{ render_field(edit_hardware_form.hardware_type_new, class_="form-control") }}
+        </div>
+
+        <div class="container" style="width: 60%; align-self: center; align-content: center" )>
+            {{ edit_hardware_form.submit_hardware(class_="btn btn-blk btn-primary", style="width: 50%") }}
+        </div>
+    </form>
+
+</div>
+{% endblock %}

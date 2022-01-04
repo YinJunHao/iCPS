@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Register Equipment to Workcell</h1>
+    <p class="lead">
+        Choose equipment to register to workcell {{ location_id }}
+    </p>
+</div>
+<div class="container" style="max-width: 500px">
+    <form method="POST" style="text-align: left">
+        {% from "includes/_formhelpers.html" import render_field %}
+        {{ new_equipment_form.csrf_token() }}
+        {{ render_field(new_equipment_form.equipment_id, class_="form-control") }}
+        <p>
+            {{ new_equipment_form.submit_equipment(style="width: 100%", class_="btn btn-primary btn-blk") }}
+        </p>
+    </form>
+    {% include 'includes/_messages.html' %}
+</div>
+{% endblock %}

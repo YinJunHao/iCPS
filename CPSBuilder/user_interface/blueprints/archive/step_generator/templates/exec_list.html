@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="cover-heading">Recommended Method</h1>
+        <p>
+            This is the recommended method and executor recommended by iCPS. <br />
+            User is free to reject or accept the recommendation to be sent
+            to manufacturing. <br />
+            <br />
+            Please indicate whether the displayed step is acceptable.
+        </p>
+    </div>
+</div>
+<div class="container">
+
+    <h1 class="display-10">Action Optimized: {{ session['action_sentence'] }}</h1>
+    <p class="lead">Location: {{ session['location_id'] }}</p>
+    <div class="table-responsive">
+        <table class="table-striped">
+            <tr style="font-weight:bold;">
+                <th class="index"></th>
+                <th class="content">Step</th>
+                <th class="content">Executor</th>
+                <th class="content">Executor ID</th>
+                <th class="content">Software</th>
+                <th class="content">Alt Executor?</th>
+                <th class="content"></th>
+                <th class="content"></th>
+            </tr>
+            {% for exec_list in session['translated_list'] %}
+            {% set outer_loop = loop %}
+            {% for exec_item in exec_list %}
+            <form method='POST'>
+                <tr>
+                    {{ edit_exec_form.csrf_token() }}
+                    {% from "includes/_formhelpers.html" import render_field %}
+                    {{ edit_exec_form.step_request_id(value = outer_loop.index0) }}
+                    {{ edit_exec_form.exec_request_id(value = loop.index0) }}
+                    <td class="index">{{outer_loop.index}}</td>
+                    <td class="content">{{exec_item['step_sentence']}}</td>
+                    <td class="content">{{exec_item['name']}}</td>
+                    <td class="content">{{exec_item['ID']}}</td>
+                    <td class="content">{{exec_item['software_name']}}</td>
+                    
+                    <td class="content">
+                        {% if exec_item['allow_alternative_exec'] %}
+                        {{ edit_exec_form.allow_alternative(style="width: 25%", class_="btn btn-primary btn-sm") }} 
+                        {% else %}
+                        {{ edit_exec_form.allow_alternative(style="width: 25%", class_="btn btn-outline-primary btn-sm") }} 
+                        {% endif %} <b>{{ exec_item['allow_alternative_exec'] }}</b> 
+                    </td>
+
+                    <td class="content">{{ edit_exec_form.edit_exec(style="width: 100%", class_="btn btn-dark btn-blk")
+                        }}</td>
+                    <td class="content">{{ edit_exec_form.edit_software(style="width: 100%", class_="btn btn-dark
+                        btn-blk") }}</td>
+                </tr>
+            </form>
+            {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+    <form method='POST' business=''>
+        <div class="container" style="text-align: center">           
+            {{ form.hidden_tag() }}
+            <button class="btn btn-primary" name="accept_cancel" value="accept" style="width: 40%">Accept</button>
+        </div>
+    </form>
+    <p>{% include 'includes/_messages.html' %}</p>
+</div>
+<!-- {{ test_out }} -->
+{% endblock %}

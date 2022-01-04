@@ -1,0 +1,32 @@
+.header {
+    text-align: center;
+}
+
+#select-location-page {
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+td{
+    height: 5rem;
+    font-weight: 400;
+    font-size: 2rem;
+}
+
+th {
+    background: #303030;
+    color: white;
+    height: 3rem;
+    font-size: 2rem;
+}
+
+#table button {
+    font-size: 2rem;
+}

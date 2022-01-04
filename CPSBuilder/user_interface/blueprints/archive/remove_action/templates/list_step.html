@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Registered Steps for {{ action_sentence }}</h1>
+    <p class="lead">
+        These are all the registered step definitions for selected actions.
+    </p>
+</div>
+<div>
+    <div class="container" style="align-self: center; align-content: center">
+        {% from "includes/_formhelpers.html" import render_field %}
+        {% for step_list in session['step_lists'] %}
+        {% set outer_loop = loop %}
+        <p class="lead" style="text-align: left"> {{ action_sentence }} {{ outer_loop.index }} </p>
+        <p style="text-align: left"> Registered Location: {{ location_list[outer_loop.index0] }}</p>
+        <table class="table-striped" style="width: 100%;">
+            <tr>
+                <th class="index"></th>
+                <th class="content">Step</th>
+                <th class="content" style="text-align: center"></th>
+            </tr>
+
+            {% for step in step_list %}
+            <form method='POST'>
+                <tr>
+                    {{ edit_step_form.csrf_token() }}
+                    {{ edit_step_form.step_request_id(value = loop.index0) }}
+                    {{ edit_step_form.action_request_id(value = outer_loop.index0) }}
+                    <td class="index">{{ loop.index }}</td>
+                    <td class="content">{{ step[1] }}</td>
+                    <td class="content" style="text-align: center">{{ edit_step_form.edit_item(style="width:
+                        100%;", class_="btn btn-primary btn-blk") }}</td>
+                </tr>
+            </form>
+            {% endfor %}
+
+        </table>
+        <form method='POST'>
+            {{ delete_action_form.csrf_token() }}
+            {{ delete_action_form.request_id(value = loop.index0) }}
+            {{ delete_action_form.edit_task(style="width: 100%;", class_="btn btn-success btn-blk") }}
+            {{ delete_action_form.delete_item(style="width: 100%;", class_="btn btn-dark btn-blk") }}
+        </form>
+        {% endfor %}
+
+        <p>{% include 'includes/_messages.html' %}</p>
+    </div>
+    <div class="container">
+        <form method='POST'>
+            {{ confirm_edits_form.csrf_token() }}
+            {{ confirm_edits_form.confirm_edits(style="width: 50%;", class_="btn btn-primary") }}
+        </form>
+    </div>
+    <div class="container">
+        <form method='POST'>
+            {{ add_new_step_form.csrf_token() }}
+            {{ add_new_step_form.add_step(style="width: 50%;", class_="btn btn-secondary") }}
+        </form>
+    </div>
+
+</div>
+{% endblock %}

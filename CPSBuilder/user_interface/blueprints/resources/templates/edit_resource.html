@@ -1,0 +1,188 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/resources/edit_resource.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1>Edit {{ editing_resource["name"] }}</h1>
+        <p class="lead">
+            Click confirm changes when finish editing
+        </p>
+    </div>
+    {% include "includes/_messages.html" %}
+    <div class="container" id="edit-page">
+        <form method="POST">
+            <table id="table" class="table-striped">
+            {{ form.csrf_token() }}
+                <tr>
+                    <th>Info</th>
+                    <td><b>Old</b></td>
+                    <td><b>New</b></td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ editing_resource["name"] }}</td>
+                    <td>{{ form.name(class_="form-control", value=editing_resource["name"]) }}</td>
+                </tr>
+                <tr>
+                    <th>Type</th>
+                    <td>{{ editing_resource["type"] }}</td>
+                    <td>
+                        <div class="form-row">
+                            <div class="col">
+                                {{ form.type(class_="form-control", value="test") }}
+                            </div>
+                            <div class="col">
+                                {{ form.type_new(class_="form-control", placeholder="If type not found:") }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% if resource_class in ["robot", "hardware", "human"] %}
+                    <tr>
+                        <th>Position Sensor Tag</th>
+                        <td>{{ editing_resource["coordinate"]["position_sensor_tag"] }}</td>
+                        <td>{{ form.position_sensor_tag(class_="form-control", value=editing_resource["coordinate"]["position_sensor_tag"]) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Location ID</th>
+                        <td>{{ editing_resource["location_id"] }}</td>
+                        <td>{{ form.location_id(class_="form-control", value=editing_resource["location_id"]) }}</td>
+                    </tr>
+<!--                    <tr>-->
+<!--                        <th>Coordinates</th>-->
+<!--                        <td>x: {{ editing_resource["coordinate"]["x"] }}</td>-->
+<!--                        <td>{{ form.position_x(class_="form-control", value=editing_resource["coordinate"]["x"]) }}</td>-->
+<!--                    </tr>-->
+<!--                     <tr>-->
+<!--                        <th></th>-->
+<!--                        <td>y: {{ editing_resource["coordinate"]["y"] }}</td>-->
+<!--                        <td>{{ form.position_y(class_="form-control", value=editing_resource["coordinate"]["y"]) }}</td>-->
+<!--                    </tr>-->
+<!--                     <tr>-->
+<!--                        <th></th>-->
+<!--                        <td>z: {{ editing_resource["coordinate"]["z"] }}</td>-->
+<!--                        <td>{{ form.position_z(class_="form-control", value=editing_resource["coordinate"]["z"]) }}</td>-->
+<!--                    </tr>-->
+                    {% elif resource_class == "software" %}
+                        {% for param in editing_resource["param_var"] %}
+                            {% if loop.index0 == 0 %}
+                                <tr>
+                                    <th>Parameters</th>
+                                    <td>{{ param }}</td>
+                                    <td>
+                                        <div class="new-variable">
+                                            {{ form.param(class_="form-control", value=param) }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <th></th>
+                                    <td>{{ param }}</td>
+                                    <td>
+                                        <div class="new-variable">
+                                            {{ form.param(class_="form-control", value=param) }}
+<!--                                            <icon class="material-icons remove-variable" onclick="removeVariable(this)">-->
+<!--                                                remove_circle-->
+<!--                                            </icon>-->
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% for state in editing_resource["state_var"] %}
+                        {% if loop.index0 == 0 %}
+                            <tr>
+                                <th>States</th>
+                                <td>{{ state }}</td>
+                                <td>
+                                    <div class="new-variable">
+                                        {{ form.state(class_="form-control", value=state) }}
+                                    </div>
+                                </td>
+                                </tr>
+                             {% else %}
+                                 <tr>
+                                    <th></th>
+                                    <td>{{ state }}</td>
+                                    <td>
+                                        <div class="new-variable">
+                                        {{ form.state(class_="form-control", value=state) }}
+<!--                                        <icon class="material-icons remove-variable" onclick="removeVariable(this)">-->
+<!--                                                remove_circle-->
+<!--                                            </icon>-->
+                                        </div>
+                                    </td>
+                                </tr>
+                             {% endif %}
+                        {% endfor %}
+                    {% for physical in editing_resource["physical_resource_id"] %}
+                        {% if loop.index0 == 0 %}
+                            <tr>
+                                <th>Allocated Physical Resource</th>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <th></th>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <th>Position</th>
+                        <td>x: {{ editing_resource["position"]["x"] }}</td>
+                        <td>{{ form.position_x(class_="form-control", value=editing_resource["position"]["x"]) }}</td>
+                    </tr>
+                     <tr>
+                        <th></th>
+                        <td>y: {{ editing_resource["position"]["y"] }}</td>
+                        <td>{{ form.position_y(class_="form-control", value=editing_resource["position"]["y"]) }}</td>
+                    </tr>
+                     <tr>
+                        <th></th>
+                        <td>z: {{ editing_resource["position"]["z"] }}</td>
+                        <td>{{ form.position_z(class_="form-control", value=editing_resource["position"]["z"]) }}</td>
+                    </tr>
+                     <tr>
+                        <th>Orientation</th>
+                        <td>α: {{ editing_resource["orientation"]["alpha"] }}</td>
+                        <td>{{ form.alpha(class_="form-control", value=editing_resource["orientation"]["alpha"]) }}</td>
+                    </tr>
+                     <tr>
+                        <th></th>
+                        <td>β: {{ editing_resource["orientation"]["beta"] }}</td>
+                        <td>{{ form.beta(class_="form-control", value=editing_resource["orientation"]["beta"]) }}</td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>γ: {{ editing_resource["orientation"]["gamma"] }}</td>
+                        <td>{{ form.gamma(class_="form-control", value=editing_resource["orientation"]["gamma"]) }}</td>
+                    </tr>
+                    <tr>
+                        <th>Size</th>
+                        <td>Length: {{ editing_resource["size"]["length"] }}</td>
+                        <td>{{ form.length(class_="form-control", value=editing_resource["size"]["length"]) }}</td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>Width: {{ editing_resource["size"]["width"] }}</td>
+                        <td>{{ form.width(class_="form-control", value=editing_resource["size"]["width"]) }}</td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>Height: {{ editing_resource["size"]["height"] }}</td>
+                        <td>{{ form.height(class_="form-control", value=editing_resource["size"]["height"]) }}</td>
+                    </tr>
+                {% endif %}
+            </table>
+            <div class="edit-actions">
+                <button class="btn btn-light" name="cancel" value="/">Cancel</button>
+                <button class="btn btn-primary" type="submit" name="confirm-changes" value="/">Confirm Changes</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/resources/edit_resource.js") }}"></script>
+{% endblock %}
+

@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Manage Resources</h1>
+    <p class="lead">
+        Choose which resource type that you want to manage.
+    </p>
+</div>
+<div class="container" style="max-width: 500px">
+    <h3 class="cover-heading">Choose resource type to manage</h3>
+    <form method="POST">
+        {% from "includes/_formhelpers.html" import render_field %}
+        {{ resource_type.csrf_token() }}
+        <p>{{ resource_type.choose_robot(style="width: 50%;", class_="btn btn-primary") }}</p>
+        <p>{{ resource_type.choose_hardware(style="width: 50%;", class_="btn btn-primary") }}</p>
+        <p>{{ resource_type.choose_software(style="width: 50%;", class_="btn btn-primary") }}</p>
+        <p>{{ resource_type.choose_workcell(Style="widtH: 50%;", class_="btn btn-primary") }}</p>
+    </form>
+    {% include 'includes/_messages.html' %}
+</div>
+{% endblock %}

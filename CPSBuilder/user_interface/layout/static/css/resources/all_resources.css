@@ -1,0 +1,41 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "all_resources.html" tab
+ * Written by Yin Jun Hao
+*/
+
+/*all_resources.html*/
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.grow {
+    transition: all .25s ease-in-out;
+    flex-grow: 1;
+}
+
+.grow:hover {
+    transform: scale(1.5);
+    flex-grow: 4;
+}
+
+.images {
+    margin: 8rem 3rem;
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+    list-style: none;
+}
+.images button {
+    border: none;
+    background: none;
+}
+.images img {
+    width: 25rem;
+}
+.images p {
+    font-size: 3rem;
+    font-weight: 400;
+}

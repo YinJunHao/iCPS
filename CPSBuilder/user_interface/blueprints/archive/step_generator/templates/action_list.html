@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">iCPS Optimizer</h1>
+    <p class="lead">
+        iCPS finds and suggests to user optimized manufacturing methods
+        in compliance with CGMP and ISO rulings.
+    </p>
+</div>
+<div class="container">
+    <h5 class="lead"><b>Chosen Task: {{ task_sentence }}</b></h5>
+    <div class="container" style="align-self: center; align-content: center">
+        {% from "includes/_formhelpers.html" import render_field %}
+
+        <table class="table-striped" style="width: 100%;">
+            <tr>
+                <th class="index"></th>
+                <th class="content">Action</th>
+                <th class="content" style="text-align: center"></th>
+                <th class="content" style="text-align: center"></th>
+            </tr>
+
+            {% for action in session['action_sentences'] %}
+            <form method='POST'>
+                <tr>
+                    {{ optimize_action.csrf_token() }}
+                    {{ optimize_action.request_id(value = loop.index0) }}
+                    <td class="index">{{ loop.index }}</td>
+                    <td class="content">{{ action }}</td>
+                    {% if session['actions_optimized_idx'][loop.index0] == True %}
+                    <td class="content" style="text-align: center"></td>
+                    <td class="content" style="text-align: center">{{ optimize_action.review_item(style="width: 100%;",
+                        class_="btn btn-dark btn-blk") }}</td>
+                    {% else %}
+                    <td class="content" style="text-align: center">{{ optimize_action.optimize_item(style="width:
+                        100%;", class_="btn btn-primary btn-blk") }}</td>
+                    <td class="content" style="text-align: center">{{ optimize_action.use_existing(style="width:
+                        100%;", class_="btn btn-secondary btn-blk") }}</td>
+                    {% endif %}
+
+                </tr>
+            </form>
+            {% endfor %}
+
+        </table>
+        <form method='POST'>
+            {{ submit_job.csrf_token() }}
+            {% if complete_edit %}
+            <button type="button" class="btn btn-primary btn-blk" style="width: 100%;" data-toggle="modal" data-target="#{{ task }}">
+                Submit
+            </button>
+
+            <div class="modal fade" id="{{ task }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Submission Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            No process blockage detected. Confirm submission. <br>
+                            Check submission and status in Job History.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            {{ submit_job.submit_job(class_="btn btn-success btn-blk") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            {{ submit_job.submit_job(style="width:100%", class_="btn btn-primary btn-blk") }}
+            {% endif %}
+        </form>
+    </div>
+    <p>{% include 'includes/_messages.html' %}</p>
+</div>
+
+{% endblock %}

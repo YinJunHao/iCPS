@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Execute Job</h1>
+    <p class="lead">
+        Execute registered Jobs
+    </p>
+</div>
+<div class="container">
+    {{ job_id }}
+    {{ action_list }}
+    {{ action_details }}
+
+</div>
+{% endblock %}

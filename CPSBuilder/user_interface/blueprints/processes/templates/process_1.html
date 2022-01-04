@@ -1,0 +1,369 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/processes/process.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">{{ task_details["task"]["sentence"] }}</h1>
+        <p class="lead">
+            Below are details for the selected task
+        </p>
+    </div>
+    <div class="container" id="process-page">
+        <div class="layer">
+            <div class="row layer-details">
+                <div class="col layer-details" id="task-layer">
+                    <p>name: {{ task_details["task"]["sentence"] }}<p>
+                    <p>layer: {{ task_details["task"]["layer"] }}<p>
+                    <p>created by: {{ task_details["task"]["created_by"] }}</p>
+                    <p>last update: {{ task_details["task"]["last_update"] }}</p>
+                </div>
+                <div class="col layer-details" id="task-layer-1">
+                    <p>name: {{ task_details["task"]["sentence"] }}<p>
+                    <p>layer: {{ task_details["task"]["layer"] }}<p>
+                    <p>created by: {{ task_details["task"]["created_by"] }}</p>
+                    <p>last update: {{ task_details["task"]["last_update"] }}</p>
+                </div>
+                <div class="col">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="actions">
+                            <button class="btn btn-warning custom-btn" name="conflict-check" value="/">Conflict Check
+                            </button>
+                            <button type=button id="tree-nav-button" class="btn btn-info" onclick="showTree()">Tree
+                                Nav
+                            </button>
+                        </div>
+                        <div>
+                            <button class="btn btn-primary" id="process-edit-button" name="edit"
+                                    value="{{ task_details["task"]["_id"] }}">Edit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+<!--        <div id="content-layer">-->
+<!--            {% if layer_details["layer"] == "step" %}-->
+<!--                <div id="grid-task">-->
+                    <div class="grid-details">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th colspan="2">Parameters</th>
+                            </tr>
+                            <tr>
+                                <th>name</th>
+                                <th>type</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for param in layer_details["step_param"] %}
+                                <tr>
+                                    <td>{{ param["param"]["var"] }}</td>
+                                    <td>{{ param["param"]["type"] }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tbody>
+                        </table>
+                    </div>
+                    <div class="grid-details">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th colspan="3">state executors</th>
+                            </tr>
+                            </thead>
+                            {% for exec in layer_details["state_exec"] %}
+                            <tbody>
+                                <tr>
+                                    <th>name</th>
+                                    <th>class</th>
+                                    <th>type</th>
+                                </tr>
+                                <tr>
+                                    <td>{{ exec["var"] }}</td>
+                                    <td>{{ exec["class"] }}</td>
+                                    <td>{{ exec["type"] }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Executor Class</th>
+                                    <th>Executor Name</th>
+                                    <th>Executor Software</th>
+                                </tr>
+                                {% for executor in exec["exec"] %}
+                                    <tr>
+                                        <td>{{ executor["physical_resource_class"] }}</td>
+                                        <td>{{ executor["physical_resource_name"] }}</td>
+                                        <td>{{ executor["cyber_resource_name"] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            <tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="grid-details">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th>blocker steps</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for blockstep in layer_details["step_condition"]["isBlockedByStep"]["StepBlocker"] %}
+                                <tr>
+                                    <td>{{ blockstep["sentence"] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="grid-details">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th>blocker states</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for blockstate in layer_details["step_condition"]["isBlockedByState"]["StateBlocker"] %}
+                                <tr>
+                                    <td>{{ blockstate["var"] }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="grid-details">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th colspan="2">prerequisite steps</th>
+                            </tr>
+                            <tr>
+                                <th>set index</th>
+                                <th>list</th>
+                            </tr>
+                            </thead>
+                            {% for prereqstep in layer_details["step_condition"]["hasPrerequisiteStep"] %}
+                                <tbody>
+                                {% for name in prereqstep["StepPrerequisite"] %}
+                                    <tr>
+                                        {% if loop.index == 1 %}
+                                            <td>{{ prereqstep["index"] }}</td>
+                                            <td>{{ name["sentence"] }}</td>
+                                        {% else %}
+                                            <td></td>
+                                            <td>{{ name["sentence"] }}</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="grid-details">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th colspan="2">prerequisite states</th>
+                            </tr>
+                            <tr>
+                                <th>set index</th>
+                                <th>list</th>
+                            </tr>
+                            </thead>
+                            {% for prereqstate in layer_details["step_condition"]["hasPrerequisiteState"] %}
+                                <tbody>
+                                {% for name in prereqstate["StatePrerequisite"] %}
+                                    <tr>
+                                        {% if loop.index == 1 %}
+                                            <td>{{ prereqstate["index"] }}</td>
+                                            <td>{{ name["var"] }}</td>
+                                        {% else %}
+                                            <td></td>
+                                            <td>{{ name["var"] }}</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="grid-details" id="isachievedby">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th colspan="2">achieving conditions</th>
+                            </tr>
+                            {% for cond in layer_details["step_condition"]["isAchievedBy"] %}
+                                <tbody>
+                                <tr>
+                                    <th colspan="2">Set {{ loop.index }}</th>
+                                </tr>
+                                <tr>
+                                    <th>prerequisite states set index</th>
+                                    <th>correct states</th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table class="table table-borderless">
+                                            {% for prereqstate in cond["hasPrerequisiteState"] %}
+                                                <tr>
+                                                    <td>{{ prereqstate["index"] }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table table-borderless">
+                                            {% for statecorrect in cond["StateCorrect"] %}
+                                                <tr>
+                                                    <td>{{ statecorrect["var"] }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            {% endfor %}
+                        </table>
+                    </div>
+<!--                    <div class="grid-details" id="isfailedby">-->
+<!--                        <table class="table table-borderless">-->
+<!--                            <thead>-->
+<!--                            <tr>-->
+<!--                                <th colspan="4">failing conditions</th>-->
+<!--                            </tr>-->
+<!--                            {% for cond in layer_details["step_condition"]["isFailedByState"] %}-->
+<!--                                <tbody>-->
+<!--                                <tr>-->
+<!--                                    <th colspan="4">Set {{ loop.index }}</th>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <th>prerequisite states set index</th>-->
+<!--                                    <th>Failed State</th>-->
+<!--                                    <th>correct states</th>-->
+<!--                                    <th>return to step</th>-->
+<!--                                </tr>-->
+<!--                                <tr>-->
+<!--                                    <td>-->
+<!--                                        <table class="table table-borderless">-->
+<!--                                            {% for prereqstate in cond["hasPrerequisiteState"] %}-->
+<!--                                                <tr>-->
+<!--                                                    <td>{{ prereqstate["index"] }}</td>-->
+<!--                                                </tr>-->
+<!--                                            {% endfor %}-->
+<!--                                        </table>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <table class="table table-borderless">-->
+<!--                                            {% for statewrong in cond["StateWrong"] %}-->
+<!--                                                <tr>-->
+<!--                                                    <td>{{ statewrong["var"] }}</td>-->
+<!--                                                </tr>-->
+<!--                                            {% endfor %}-->
+<!--                                        </table>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <table class="table table-borderless">-->
+<!--                                            {% for statecorrect in cond["StateCorrect"] %}-->
+<!--                                                <tr>-->
+<!--                                                    <td>{{ statecorrect["var"] }}</td>-->
+<!--                                                </tr>-->
+<!--                                            {% endfor %}-->
+<!--                                        </table>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <table class="table table-borderless">-->
+<!--                                            {% for stepreturn in cond["StepReturn"] %}-->
+<!--                                                <tr>-->
+<!--                                                    <td>{{ stepreturn["sentence"] }}</td>-->
+<!--                                                </tr>-->
+<!--                                            {% endfor %}-->
+<!--                                        </table>-->
+<!--                                    </td>-->
+<!--                                </tr>-->
+<!--                                </tbody>-->
+<!--                            {% endfor %}-->
+<!--                        </table>-->
+<!--                    </div>-->
+                    <div class="grid-details" id="location-id">
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th>Location ID</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for location_id in layer_details["location_id"] %}
+                                <tr>
+                                    <td>{{ location_id }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tbody>
+                        </table>
+                    </div>
+<!--                </div>-->
+<!--            {% else %}-->
+<!--                <div class="table-task">-->
+<!--                    <div class="content-layer replace-underscore">content-->
+<!--                        layer: {{ layer_details["content_layer"] }}</div>-->
+<!--                    {% for cont in layer_details["content"] %}-->
+                        <div class="cont">
+                            <i class="material-icons" onclick="moreDetails(this)">chevron_right</i>
+                            <p>{{ cont["sentence"] }}</p>
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button class="btn btn-outline-info" name="details" value="{{ cont["index"] }}">Details
+                                </button>
+                            </form>
+                        </div>
+<!--                        {% if layer_details["content_layer"] == "step" %}-->
+                            <table class="table table-striped content-details">
+                                <tbody>
+                                <tr>
+                                    <td><b>condition</b></td>
+                                    <td><b>sets</b></td>
+                                </tr>
+                                <tr>
+                                    <td>location id</td>
+                                    <td>{{ cont["content_details"]["location_id"] }}</td>
+                                </tr>
+                                <tr>
+                                    <td>parameters</td>
+                                    <td>
+                                        {% for param in cont["content_details"]["step_param"] %}
+                                            <div>{{ param["param"]["var"] }}</div>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+<!--                        {% else %}-->
+<!--                            <table class="table table-striped content-details">-->
+<!--                                <tbody>-->
+<!--                                <tr>-->
+<!--                                    <td><b>content name</b></td>-->
+<!--                                    <td><b>content layer</b></td>-->
+<!--                                    <td><b>last update</b></td>-->
+<!--                                    <td><b>last updated by</b></td>-->
+<!--                                </tr>-->
+<!--                                {% for content in cont["content_details"] %}-->
+<!--                                    <tr>-->
+<!--                                        <td>{{ content["sentence"] }}</td>-->
+<!--                                        <td>{{ content["layer"] }}</td>-->
+<!--                                        <td>{{ content["last_update"] }}</td>-->
+<!--                                        <td>{{ content["last_updated_by"] }}</td>-->
+<!--                                    </tr>-->
+<!--                                {% endfor %}-->
+<!--                                </tbody>-->
+<!--                            </table>-->
+<!--                        {% endif %}-->
+<!--                    {% endfor %}-->
+<!--                </div>-->
+<!--            {% endif %}-->
+<!--        </div>-->
+<!--        {% include "tree.html" %}-->
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/processes/process.js") }}"></script>
+{% endblock %}

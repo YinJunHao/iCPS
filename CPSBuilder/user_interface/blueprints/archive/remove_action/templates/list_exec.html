@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">List of Execs</h1>
+    <p class="lead">
+        These are all the registered exec definitions for chosen step.
+    </p>
+</div>
+<div>
+    <div class="container" style="align-self: center; align-content: center">
+        {% from "includes/_formhelpers.html" import render_field %}
+        <p class="lead" style="text-align: left"><b>Chosen Action:</b> {{ step_sentence }}</p>
+        <table class="table-striped" style="width: 100%;">
+            <tr>
+                <th class="index"></th>
+                <th class="content">Resource Type</th>
+                <th class="content">Executor Type</th>
+                <th class="content">Dependency</th>
+                <th class="content">Software ID</th>
+                <th class="content">Software Name</th>
+                <th class="content" style="text-align: center"></th>
+                <th class="content" style="text-align: center"></th>
+            </tr>
+
+            {% for exec_pair in exec_list %}
+            <form method='POST'>
+                <tr>
+                    {{ edit_exec_form.csrf_token() }}
+                    {{ edit_exec_form.exec_request_id(value = loop.index0) }}
+                    <td class="index">{{ loop.index }}</td>
+                    <td class="content">{{ exec_pair['type'] }}</td>
+                    <td class="content">{{ exec_pair['executor'] }}</td>
+                    <td class="content">{{ exec_pair['dependency'] }}</td>
+                    <td class="content">{{ exec_pair['software_id'] }}</td>
+                    <td class="content">{{ exec_pair['software_name'] }}</td>
+                    <td class="content" style="text-align: center; width:15%">{{ edit_exec_form.edit_item(style="width:
+                        100%;", class_="btn btn-primary btn-blk") }}</td>
+                    <td class="content" style="text-align: center; width:15%">{{
+                        edit_exec_form.delete_item(style="width: 100%;", class_="btn btn-dark btn-blk") }}</td>
+                </tr>
+            </form>
+            {% endfor %}
+
+        </table>
+        <p>{% include 'includes/_messages.html' %}</p>
+    </div>
+    <div class="container">
+        <form method='POST'>
+            {{ add_exec_form.csrf_token() }}
+            {{ add_exec_form.confirm_add_exec(style="width: 50%;", class_="btn btn-primary") }}
+            {{ add_exec_form.add_exec(style="width: 50%;", class_="btn btn-secondary") }}
+        </form>
+    </div>
+</div>
+{% endblock %}

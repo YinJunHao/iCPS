@@ -1,0 +1,940 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/processes/edit_process.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">{{ layer_details["sentence"] }}</h1>
+        {% if session["new_process"] %}
+             <p class="lead">
+                Review the details of the new process
+            </p>
+        {% else %}
+            <p class="lead">
+                Below are the list of details for the selected content
+            </p>
+        {% endif %}
+    </div>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="container" id="process-page">
+            <div class="layer">
+                <div class="row">
+                    <div class="col layer-details">
+                        <p>name: <input class="form" type="text" name="name" value="{{ layer_details["sentence"] }}"
+                                        required></p>
+                        <p>layer: {{ layer_details["layer"] }}</p>
+                        <p>created by: {{ layer_details["created_by"] }}</p>
+                        <p>last update: {{ layer_details["last_update"] }}</p>
+                    </div>
+                    <div class="col">
+                        <div class="actions">
+                            <button class="btn btn-danger" name="delete" value="/">Delete Layer</button>
+                            <button class="btn btn-warning custom-btn" name="conflict-check" value="/">Conflict Check
+                            </button>
+                            <button type="button" id="tree-nav-button" class="btn btn-info" onclick="showTree()">Tree
+                                Nav
+                            </button>
+                        </div>
+                        <div class="actions" id="edit-process-actions">
+                            <button class="btn btn-light" name="cancel" value="/">Cancel</button>
+                            <button class="btn btn-secondary" name="save-draft" value="/">Save as Draft</button>
+                            {% if layer_details["layer"] == "task" %}
+                                <button class="btn btn-primary" name="confirm" value="/">Confirm</button>
+                            {% else %}
+                                <button class="btn btn-primary" name="task-layer" value="/">To Task Layer</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="content-layer">
+                {% if layer_details["layer"] == "step" %}
+                    <div id="grid-task">
+                        <div class="grid-details">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="3">Parameters</th>
+                                </tr>
+                                <tr>
+                                    <th>name</th>
+                                    <th>type</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for param in layer_details["step_param"] %}
+                                    <tr>
+                                        <td><input name="param" class="form-control name-col"
+                                                   value="{{ param["param"]["var"] }}"></td>
+                                        <td><select name="type" class="form-control">
+                                            <option value="{{ param["param"]["type"] }}">{{ param["param"]["type"] }}</option>
+                                        </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    onclick="removeSelection(this)"><i class="material-icons">delete</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="3">
+                                        <button type="button" class="btn btn-outline-info" onclick="addParam(this)"><i
+                                                class="material-icons">add</i></button>
+                                    </td>
+                                </tr>
+                                <tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details">
+                            <table class="table table-borderless" id="state-executors">
+                                <thead>
+                                <tr>
+                                    <th colspan="3">state executors
+                                        <button id="add-resource-button" type="button" data-toggle="modal"
+                                                data-target="#add-new-resource" class="btn btn-outline-info">Add
+                                            Resource
+                                        </button>
+                                    </th>
+                                </tr>
+                                </thead>
+                                {% for exec in layer_details["state_exec"] %}
+                                    <tbody id="{{exec["index"]|string+",state-executor"}}">
+                                        <tr>
+                                            <th>Name: </th>
+                                            <td><input name="{{exec["index"]|string+',state-exec-setname'}}" class="form-control name-col"
+                                                   value='{{ exec["var"] }}'></td>
+                                        </tr>
+                                        <tr>
+                                            <th>type</th>
+                                            <th colspan="2">class</th>
+                                        </tr>
+                                        <tr>
+                                            <td><select name="{{exec["index"]|string+',state-exec-type'}}"
+                                                        class="form-control name-col option"
+                                                        onchange="populateOptionsClass({{state_class|safe}}, this.id, this.value)"
+                                                        , id="{{exec["index"]|string+',state-exec-type'}}">
+                                                {% for type in ["resource", "job", "task"] %}
+                                                {% if exec["type"] == type %}
+                                                        <option value="{{type}}" selected>{{type}}</option>
+                                                    {% else %}
+                                                         <option value="{{type}}">{{type}}</option>
+                                                    {%endif%}
+                                                {% endfor%}
+                                            </select></td>
+                                            <td><select name="{{exec["index"]|string+',state-exec-class'}}" class="form-control name-col option" id="{{exec["index"]|string+',state-exec-class'}}">
+                                                    {% for class in state_class[exec["type"]] %}
+                                                        {% if exec["class"] == class %}
+                                                            <option value="{{class}}" selected>{{class}}</option>
+                                                        {% else %}
+                                                            <option value="{{class}}">{{class}}</option>
+                                                    {%endif%}
+                                                {%endfor%}
+                                            </select></td>
+                                            <td><input name="{{exec["index"]|string+',state-exec-class-diff'}}" class="form-control name-col option" placeholder="new class"></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Executor Class</th>
+                                            <th>Executor Name</th>
+                                            <th>Executor Software</th>
+                                        </tr>
+                                        {% for executor in exec["exec"]%}
+                                            <tr>
+                                                <td><select name="{{exec["index"]|string+',state-exec-physical-class'}}" class="form-control name-col option" onchange="populateOptions({{ physical_resource|safe }}, this.id, this.value, {{loop.index}})" id="{{exec["index"]|string+',state-exec-physical-class-'+loop.index|string}}">
+                                                        {% for resource_class in ["robot", "hardware", "human"] %}
+                                                            {% if executor["physical_resource_class"] == resource_class %}
+                                                                <option value="{{resource_class}}" selected>{{resource_class}}</option>
+                                                            {% else %}
+                                                                <option value="{{resource_class }}">{{ resource_class }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                </select></td>
+                                                <td><select name="{{exec["index"]|string+',state-exec-physical-name'}}" class="form-control name-col option"
+                                                            id="{{exec["index"]|string+',state-exec-physical-name-'+loop.index|string}}"
+                                                            onchange="populateOptionsCyber({{ software_resource["software_choices"]|safe }}, this.id, this.value, , {{loop.index}})">
+                                                    {% for resource in physical_resource[executor["physical_resource_class"]] %}
+                                                        {% if executor["physical_resource_name"] == resource["name"] %}
+                                                            <option value="{{ resource["ID"] }}"
+                                                                    selected>{{ resource["name"]}}</option>
+                                                            {% else %}
+                                                                <option value="{{resource["ID"]}}">{{resource["name"]}}</option>
+                                                        {%endif%}
+                                                    {%endfor%}
+                                                </select></td>
+                                                <td><select name="{{exec["index"]|string+',state-exec-software-name'}}" class="form-control name-col option" id="{{exec["index"]|string+',state-exec-software-name-'+loop.index|string}}">
+                                                        {% for software in software_resource["software_choices"] %}
+                                                            {% if executor["physical_resource_id"] in software["physical_resource_id"] %}
+                                                                {% if executor["cyber_resource_name"] == software["name"] %}
+                                                                    <option value="{{software["ID"]}}" selected>{{software["name"]}}</option>
+                                                                {% else %}
+                                                                    <option value="{{software["ID"]}}">{{software["name"]}}</option>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                </select></td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-info"
+                                                            onclick="addExecutors({{ exec['index'] }}, {{ physical_resource|safe }}, {{ software_resource['software_choices']|safe }})">
+                                                    <i class="material-icons">add</i></button></td>
+                                            </tr>
+                                    <tbody>
+                                {% endfor %}
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3"><button type="button"
+                                                onclick='addStateExec({{state_class|tojson|safe}}, {{physical_resource|tojson|safe}}, {{ software_resource["software_choices"]|tojson|safe }})' class="btn btn-outline-info">
+                                            <i class="material-icons">add</i></button></td>
+                                        </tr>
+                                    </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="2">blocker steps</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for blockstep in layer_details["step_condition"]["isBlockedByStep"]["StepBlocker"] %}
+                                    <tr>
+                                        <td><select class="form-control" name="StepBlocker">
+                                            <option value="{{ blockstep["index"] }}">{{ blockstep["sentence"] }}</option>
+                                            {% for step in session["process_details"]["step"] %}
+                                                {% if step["index"] != blockstep["index"] %}
+                                                    <option value="{{ step["index"] }}">{{ step["sentence"] }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    onclick="removeSelection(this)"><i class="material-icons">delete</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="2">
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSelect(this, {{ session["process_details"]["step"]|tojson }}, "StepBlocker", "StepBlocker")'>
+                                            <i class="material-icons">add</i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="2">blocker states</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for blockstate in layer_details["step_condition"]["isBlockedByState"]["StateBlocker"] %}
+                                    <tr>
+                                        <td><select class="form-control" name="StateBlocker">
+                                            <option value="{{ blockstate["index"] }}">{{ blockstate["var"] }}</option>
+                                        </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    onclick="removeSelection(this)"><i class="material-icons">delete</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="2">
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSelect(this, {{ session["process_details"]["state"]|tojson }}, "StateBlocker", "StateBlocker")'>
+                                            <i class="material-icons">add</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="4">prerequisite step</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>set index</th>
+                                    <th>list</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                {% for prereqstep in layer_details["step_condition"]["hasPrerequisiteStep"] %}
+                                    <tbody>
+                                    {% for name in prereqstep["StepPrerequisite"] %}
+                                        <tr>
+                                            {% if loop.index == 1 %}
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick='removeSet(this, "hasPrerequisiteStep", {{ prereqstep["index"] }})'>
+                                                        <i
+                                                                class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                                <td>{{ prereqstep["index"] }}</td>
+                                                <td>
+                                                    <select class="form-control"
+                                                            name="{{ prereqstep["index"]|string+",hasPrerequisiteStep" }}">
+                                                        <option value="{{ name["index"] }}">{{ name["sentence"] }}</option>
+                                                        {% for step in session["process_details"]["step"] %}
+                                                            {% if step["index"] != name["index"] %}
+                                                                <option value="{{ step["index"]|string }}">{{ step["sentence"] }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick="removeCondition(this)"><i class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                            {% else %}
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <select class="form-control"
+                                                            name="{{ prereqstep["index"]|string+",hasPrerequisiteStep" }}">
+                                                        <option value="{{ name["index"] }}">{{ name["sentence"] }}</option>
+                                                        {% for step in session["process_details"]["step"] %}
+                                                            {% if step["index"] != name["index"] %}
+                                                                <option value="{{ step["index"]|string }}">{{ step["sentence"] }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick="removeCondition(this)"><i class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-info"
+                                                    onclick='addSelectSet(this, {{ session["process_details"]["step"]|tojson }}, "hasPrerequisiteStep", {{ prereqstep["index"] }})'>
+                                                <i
+                                                        class="material-icons">add</i></button>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                {% endfor %}
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSet(this, {{ session["process_details"]["step"]|tojson }}, "hasPrerequisiteStep")'>
+                                            <i class="material-icons">add</i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="4">prerequisite states</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>set index</th>
+                                    <th>list</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                {% for prereqstate in layer_details["step_condition"]["hasPrerequisiteState"] %}
+                                    <tbody>
+                                    {% for name in prereqstate["StatePrerequisite"] %}
+                                        <tr>
+                                            {% if loop.index == 1 %}
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick='removeSet(this, "hasPrerequisiteState", {{ prereqstate["index"] }})'>
+                                                        <i class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                                <td>{{ prereqstate["index"] }}</td>
+                                                <td>
+                                                    <select class="form-control"
+                                                            name="{{ prereqstate["index"]|string+",hasPrerequisiteState" }}">
+                                                        <option value="{{ name["index"] }}">{{ name["var"] }}</option>
+                                                        {% for state in session["process_details"]["state"] %}
+                                                            {% if state["index"] != name["index"] %}
+                                                                <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick='removeCondition(this)'><i
+                                                            class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                            {% else %}
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <select class="form-control"
+                                                            name="{{ prereqstate["index"]|string+",hasPrerequisiteState" }}">
+                                                        <option value="{{ name["index"] }}">{{ name["var"] }}</option>
+                                                        {% for state in session["process_details"]["state"] %}
+                                                            {% if state["index"] != name["index"] %}
+                                                                <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick="removeCondition(this)"><i class="material-icons">delete</i>
+                                                    </button>
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-info"
+                                                    onclick='addSelectSet(this, {{ session["process_details"]["state"]|tojson }}, "hasPrerequisiteState", {{ prereqstate["index"] }})'>
+                                                <i
+                                                        class="material-icons">add</i></button>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                {% endfor %}
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSet(this, {{ session["process_details"]["state"]|tojson }}, "hasPrerequisiteState")'>
+                                            <i
+                                                    class="material-icons">add</i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details" id="isachievedby">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="4">achieving conditions</th>
+                                </tr>
+                                </thead>
+                                {% for cond in layer_details["step_condition"]["isAchievedBy"] %}
+                                    <tbody>
+                                    <tr>
+                                        <th colspan="3">set {{ loop.index }}</th>
+                                        <th>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    onclick='removeSet(this, "achieving conditions")'><i
+                                                    class="material-icons">delete</i>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>prerequisite states set index</th>
+                                        <th></th>
+                                        <th>correct states</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table table-borderless">
+                                                {% for prereqstate in cond["hasPrerequisiteState"] %}
+                                                    <tr></tr>
+                                                    <tr>
+                                                        <td><select
+                                                                name="{{ loop.index|string+",isAchievedPreregstateset" }}"
+                                                                class="form-control Preregstateset">
+                                                            <option value="{{ prereqstate["index"] }}">{{ prereqstate["index"] }}</option>
+                                                            {% for state in layer_details["step_condition"]["hasPrerequisiteState"] %}
+                                                                {% if state["index"] != prereqstate["index"] %}
+                                                                    <option value="{{ state["index"] }}">{{ state["index"] }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeCondition(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick='addSelect(this, {{ layer_details["step_condition"]["hasPrerequisiteState"] }}, "isAchievedPreregstateset", {{ loop.index }})'>
+                                                            <i
+                                                                    class="material-icons">add</i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table table-borderless">
+                                                {% for statecorrect in cond["StateCorrect"] %}
+                                                    <tr></tr>
+                                                    <tr>
+                                                        <td><select type="text"
+                                                                    name="{{ loop.index|string+",isAchievedBy" }}"
+                                                                    class="form-control">
+                                                            <option value="{{ statecorrect["index"] }}">{{ statecorrect["var"] }}</option>
+                                                            {% for state in layer_details["state_exec"] %}
+                                                                {% if state["index"] != statecorrect["index"] %}
+                                                                    <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeCondition(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick='addSelect(this, {{ layer_details["state_exec"]|tojson }}, "isAchievedBy", {{ loop.index }})'>
+                                                            <i
+                                                                    class="material-icons">add</i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tbody>
+                                <tr>
+                                    <td colspan="4">
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSetCorrect(this, {{ layer_details["step_condition"]["hasPrerequisiteState"]|tojson }}, {{ session["process_details"]["state"]|tojson }})'>
+                                            <i
+                                                    class="material-icons">add</i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details" id="isfailedby">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="8">failing conditions</th>
+                                </tr>
+                                </thead>
+                                {% for cond in layer_details["step_condition"]["isFailedByState"] %}
+                                    <tbody>
+                                    <tr>
+                                        <th colspan="6">set {{ loop.index }}</th>
+                                        <th colspan="2">
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    onclick="removeSet(this)"><i class="material-icons">delete</i>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>prerequisite states set index</th>
+                                        <th></th>
+                                        <th>failed state</th>
+                                        <th></th>
+                                        <th>correct states</th>
+                                        <th></th>
+                                        <th>return to step</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table table-borderless">
+                                                {% for prereqstate in cond["hasPrerequisiteState"] %}
+                                                    <tr></tr>
+                                                    <tr>
+                                                        <td><select
+                                                                name="{{ loop.index|string+",isFailedPreregstateset" }}"
+                                                                class="form-control Preregstateset">
+                                                            <option value="{{ prereqstate["index"] }}">{{ prereqstate["index"] }}</option>
+                                                            {% for state in layer_details["step_condition"]["hasPrerequisiteState"] %}
+                                                                {% if state["index"] != prereqstate["index"] %}
+                                                                    <option value="{{ state["index"] }}">{{ state["index"] }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeCondition(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick='addSelect(this, {{ layer_details["step_condition"]["hasPrerequisiteState"] }}, "isFailedPreregstateset", {{ loop.index }})'>
+                                                            <i
+                                                                    class="material-icons">add</i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table table-borderless">
+                                                {% for statewrong in cond["StateWrong"] %}
+                                                    <tr>
+                                                        <td><select name="{{ loop.index|string+",isFailedByState" }}"
+                                                                    class="form-control">
+                                                            <option value="{{ statewrong["index"] }}">{{ statewrong["var"] }}</option>
+                                                            {% for state in layer_details["state_exec"] %}
+                                                                {% if state["index"] != statewrong["index"] %}
+                                                                    <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeCondition(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick='addSelect(this, {{ layer_details["state_exec"]|tojson }}, "isFailedByState", {{ loop.index }})'>
+                                                            <i
+                                                                    class="material-icons">add</i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table table-borderless">
+                                                {% for statecorrect in cond["StateCorrect"] %}
+                                                    <tr>
+                                                        <td><select name="{{ loop.index|string+",isFailedIf" }}"
+                                                                    class="form-control">
+                                                            <option value="{{ statecorrect["index"] }}">{{ statecorrect["var"] }}</option>
+                                                            {% for state in layer_details["state_exec"] %}
+                                                                {% if state["index"] != statecorrect["index"] %}
+                                                                    <option value="{{ state["index"] }}">{{ state["var"] }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeCondition(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick='addSelect(this, {{ layer_details["state_exec"]|tojson }}, "isFailedIf", {{ loop.index }})'>
+                                                            <i
+                                                                    class="material-icons">add</i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td colspan="2">
+                                            <table class="table table-borderless">
+                                                {% for stepreturn in cond["StepReturn"] %}
+                                                    <tr>
+                                                        <td><select name="{{ loop.index|string+",StepReturn" }}"
+                                                                    class="form-control">
+                                                            <option value="{{ stepreturn["index"] }}">{{ stepreturn["sentence"] }}</option>
+                                                        </select>
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-outline-danger"
+                                                                    onclick="removeCondition(this)"><i
+                                                                    class="material-icons">delete</i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>
+                                                        <button type="button" class="btn btn-outline-info"
+                                                                onclick='addSelect(this, {{ session["process_details"]["step"]|tojson }}, "StepReturn", {{ loop.index }})'>
+                                                            <i
+                                                                    class="material-icons">add</i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                                <tbody>
+                                <tr>
+                                    <td colspan="8">
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSetFail(this, {{ layer_details["step_condition"]["hasPrerequisiteState"]|tojson }}, {{ session["process_details"]["state"]|tojson }}, {{ session["process_details"]["step"]|tojson }})'>
+                                            <i
+                                                    class="material-icons">add</i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="grid-details" id="location-id">
+                            <table class="table table-borderless">
+                                <thead>
+                                <tr>
+                                    <th colspan="2">Location ID
+                                    <button id="add-location-button" type="button" data-toggle="modal"
+                                                data-target="#add-new-location" class="btn btn-outline-info">Add
+                                            Location
+                                    </button></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for location_id in layer_details["location_id"] %}
+                                    <tr>
+                                        <td><select class="form-control" name="location_id">
+                                            <option value="{{ location_id }}">{{ location_id }}</option>
+                                            {% for location in location_resource %}
+                                                {% if location_id != location %}
+                                                    <option value="{{ location }}">{{ location }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                    onclick="removeCondition(this)"><i class="material-icons">delete</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                <tr>
+                                    <td colspan="2">
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick='addSelect(this, {{ location_resource }}, "location_id", "location_id")'><i class="material-icons">add</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="table-task" id="table-task">
+                        <div class="content-layer replace-underscore">
+                            content layer: {{ layer_details["content_layer"] }}
+                            {% if layer_details["content_layer"] != "step" %}
+                                <button class="btn btn-outline-info" name="add-layer-before" value="/">Add Layer
+                                    Before
+                                </button>
+                            {% endif %}
+                        </div>
+                        {% for cont in layer_details["content"] %}
+                            <div class="cont">
+                                <i class="material-icons" onclick="moreDetails(this)">chevron_right</i>
+                                <input class="form" name="{{ cont["index"] }}" type="text"
+                                       value="{{ cont["sentence"] }}"
+                                       required>
+                                <div class="layer-buttons">
+                                    <button class="btn btn-outline-info" name="details" value="{{ cont["index"] }}">
+                                        Details
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="removeContent(this)">
+                                        <i class="material-icons">delete</i></button>
+                                </div>
+                            </div>
+                            {% if layer_details["content_layer"] == "step" %}
+                                <table class="table table-striped content-details">
+                                    <tbody>
+                                    <tr>
+                                        <td><b>condition</b></td>
+                                        <td><b>sets</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>location id</td>
+                                        <td>{{ cont["content_details"]["location_id"] }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>parameters</td>
+                                        <td>
+                                            {% for param in cont["content_details"]["step_param"] %}
+                                                <div>{{ param["param"]["var"] }}</div>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <table class="table table-striped content-details">
+                                    <tbody>
+                                    <tr>
+                                        <td><b>content name</b></td>
+                                        <td><b>content layer</b></td>
+                                        <td><b>last update</b></td>
+                                        <td><b>last updated by</b></td>
+                                    </tr>
+                                    {% for content in cont["content_details"] %}
+                                        <tr>
+                                            <td>{{ content["sentence"] }}</td>
+                                            <td>{{ content["layer"] }}</td>
+                                            <td>{{ content["last_update"] }}</td>
+                                            <td>{{ content["last_updated_by"] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                        {% endfor %}
+                    <div>
+                        <button id="add-objective-button" type="button" class="btn btn-outline-info"
+                                onclick="addContent()"><i class="material-icons">add</i></button>
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+            {% include "tree_edit.html" %}
+        </div>
+        {% if layer_details["layer"] == "step" %}
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal fade" id="add-new-resource" tabindex="-1"
+                     role="dialog"
+                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body add-resource" id="add-resource-page">
+                                <h1>Add New Resource</h1>
+                                <label id="resource-class-label" for="resource-class">Resource Class:</label>
+                                <select onchange="displayForm({{ robot_resource }}, {{ hardware_resource }}, {{ human_resource }}, {{ software_resource }}, {{ physical_resource|safe }})"
+                                        type="text" id="resource-class"
+                                        name="resource-class">
+                                    <option></option>
+                                    <option>robot</option>
+                                    <option>hardware</option>
+                                    <option>software</option>
+                                    <option>human</option>
+                                </select>
+                                <div id="resource-form"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-dismiss="modal">Close
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        name="add-resource" value="/">Add Resource
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal fade" id="add-new-location" tabindex="-1"
+                     role="dialog"
+                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            {% from "includes/_formhelpers.html" import render_field %}
+                            <div class="modal-body add-resource" id="add-location-page">
+                                <h1>Add New Location</h1>
+                                <div id="location-resource-form" class="add-resource-form">
+                                    {{ render_field(location_resource_form.name, class_="form-control") }}
+                                    <div class="form-row">
+                                        <div class="col">
+                                            {{ render_field(location_resource_form.type, class_="form-control") }}
+                                        </div>
+                                        <div class="col">
+                                            {{ render_field(location_resource_form.type_new, class_="form-control") }}
+                                        </div>
+                                    </div>
+                                    <p class="label-header">Position</p>
+                                    <div class="form-inline">
+                                        {{ location_resource_form.position_x.label(class_="sub-label") }}
+                                        {{ location_resource_form.position_x(class_="form-control") }}
+                                        {{ location_resource_form.position_y.label(class_="sub-label") }}
+                                        {{ location_resource_form.position_y(class_="form-control") }}
+                                        {{ location_resource_form.position_z.label(class_="sub-label") }}
+                                        {{ location_resource_form.position_z(class_="form-control") }}
+                                    </div>
+                                    <p class="label-header">Orientation</p>
+                                    <div class="form-inline">
+                                        {{ location_resource_form.alpha.label(class_="sub-label") }}
+                                        {{ location_resource_form.alpha(class_="form-control") }}
+                                        {{ location_resource_form.beta.label(class_="sub-label") }}
+                                        {{ location_resource_form.beta(class_="form-control") }}
+                                        {{ location_resource_form.gamma.label(class_="sub-label") }}
+                                        {{ location_resource_form.gamma(class_="form-control") }}
+                                    </div>
+                                    <p class="label-header">Size</p>
+                                    <div class="form-inline">
+                                        {{ location_resource_form.length.label(class_="sub-label") }}
+                                        {{ location_resource_form.length(class_="form-control") }}
+                                        {{ location_resource_form.width.label(class_="sub-label") }}
+                                        {{ location_resource_form.width(class_="form-control") }}
+                                        {{ location_resource_form.height.label(class_="sub-label") }}
+                                        {{ location_resource_form.height(class_="form-control") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-dismiss="modal">Close
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        name="add-location" value="/">Add Location
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </form>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/processes/edit_process.js") }}"></script>
+{% endblock %}

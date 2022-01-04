@@ -1,0 +1,53 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/running/running.css") }}">
+{% extends 'layout.html' %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Running</h1>
+        <p class="lead">
+            List of active/running jobs
+        </p>
+    </div>
+    <div id="running-jobs-page" class="container">
+        <table class="table table-striped" id="table">
+            <thead>
+                <tr>
+                    <th id="table-first"></th>
+                    <th>Job ID</th>
+                    <th>Submission Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in job_list %}
+                    {% set outer_loop = loop %}
+                    <tr>
+                        <td><i id="more-details-icon" onclick="moreDetails({{ loop.index }}, this)"
+                                   class="material-icons">expand_more</i></td>
+                        <td>{{ job["job_id"] }}</td>
+                        <td>{{ job["job_submission_timestamp"] }}</td>
+                        <td>{{ job["status"] }}</td>
+                    </tr>
+                        {% for task in job["task_list"] %}
+                            {% if loop.index0 == 0 %}
+                                <tr class="more-details" id="_{{ outer_loop.index }}">
+                                    <td>Task List:</td>
+                                    <td>{{ task }}</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            {% else %}
+                                <tr class="more-details" id="_{{ outer_loop.index }}">
+                                    <td></td>
+                                    <td>{{ task }}</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/running/running.js") }}"></script>
+{% endblock %}

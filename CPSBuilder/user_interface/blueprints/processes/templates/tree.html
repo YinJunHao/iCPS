@@ -1,0 +1,64 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/processes/tree.css") }}">
+    <div id="tree-nav">
+        <div class="tree-content">
+            <div class="row-tree">
+                <p>task</p>
+                    <div class="tree-detail">
+                        <button class="glow" id="task-tree-nav-0" type="button" onclick="showLayer(this.id)">{{ task_details["task"]["sentence"] }}</button>
+                    </div>
+            </div>
+            {% set ns = namespace(layer="task", next=task_details["task"]["content_layer"]) %}
+            {% for num in range(0, task_details["task"]["layer_no"]) %}
+                {% if ns.layer == "task" %}
+                    <div class="row-tree tosort">
+                        <p class="replace-underscore">{{ ns.next }}</p>
+                        {% for detail in task_details[ns.next] %}
+                            {% if detail["index"] in task_details["task"]["content_index"] %}
+                                <div class="tree-detail">
+                                    <button id="{{ ns.next|string + "-tree-nav-" + detail["index"]|string }}" type="button" onclick="showLayer(this.id)">{{ detail["sentence"] }}</button>
+                                </div>
+                                <svg class="svg">
+                                    <line class="line" id="{{ "task-0," + ns.next|string + "-" + detail["index"]|string }}"/>
+                                </svg>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="row-tree tosort">
+                        <p class="replace-underscore">{{ ns.next }}</p>
+                        {% for parent in task_details[ns.layer] %}
+                            {% for detail in task_details[ns.next] %}
+                                {% if detail["index"] in parent["content_index"] %}
+                                    <div class="tree-detail">
+                                        <button id="{{ ns.next|string + "-tree-nav-" + detail["index"]|string }}"
+                                                type="button"
+                                                onclick="showLayer(this.id)">{{ detail["sentence"] }}</button>
+                                    </div>
+                                    <svg class="svg">
+                                        <line class="line"
+                                              id="{{ ns.layer|string +"-"+parent["index"]|string + "," + ns.next|string + "-" + detail["index"]|string }}"></line>
+                                    </svg>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                {% endif %}
+                {% if ns.layer == "task" %}
+                    {% set ns.layer = task_details["task"]["content_layer"] %}
+                    {% if ns.next == "objective_layer_1" %}
+                        {% set ns.next = "step" %}
+                    {% else %}
+                        {% set ns.next = "objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int - 1)|string %}
+                    {% endif %}
+                {% else %}
+                    {% set ns.layer = "objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int)|string %}
+                    {% if ns.next == "objective_layer_1" %}
+                        {% set ns.next = "step" %}
+                    {% else %}
+                        {% set ns.next = "objective_layer_" + (task_details["task"]["content_layer"][16:]|int - num|int - 1)|string %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button type="button" class="btn btn-light" id="close-tree" onclick="closeTree()">Close</button>
+    </div>
+    </div>

@@ -1,0 +1,24 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/user/edit_profile.css') }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1>Edit Profile</h1>
+        <p class="lead">
+            Edit details for {{ session["user_id"] }}
+        </p>
+    </div>
+    <div id="edit-profile-page">
+     <form method="POST", class="form-inline">
+         {{ form.csrf_token() }}
+        <div class="profile">
+            {% include "includes/_messages.html" %}
+            <span><b>User ID: </b><p>{{ profile_details["user_id"] }}</p></span>
+            <span><b>Name: </b><p>{{ form.name(class="form-control", value=profile_details["name"]) }}</p></span>
+            <span><b>Position: </b><p>{{ form.position(class_="form-control", value=profile_details["position"]) }}</p></span>
+            <span id="action-buttons"><a type="button" class="btn btn-secondary" name="cancel" href="{{ url_for('user.profile', user_id = session['user_id']) }}" value="/">Cancel</a>
+                <button class="btn btn-info" name="confirm" type="submit" value="/">Confirm Change</button></span>
+        </div>
+     </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,102 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/processes/new_process.css') }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">New Process</h1>
+        <p class="lead">
+            Create a new process manually or upload a file
+        </p>
+    </div>
+    <div id="new-process" class="container">
+        <div class="start-anew">
+            <h4>Start Anew...</h4>
+            <div class="upload-file">
+                <h5>With an Excel File</h5>
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <dt>
+                        <label for="file">Upload here:</label>
+                    </dt>
+                    <div class="input-group">
+                        <dd>
+                            <input onchange="changePlaceHolder(this)" type="file" name="file" class="custom-file-input" id="file" aria-describedby="file"
+                                   required>
+                            <label class="custom-file-label" for="file">Choose file</label>
+                        </dd>
+                    </div>
+                    <div id="upload">
+                        <button class="btn btn-info btn-block" type="submit" name="submit-file" value="upload">Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="manual-creation">
+                <h5>Create From Scratch</h5>
+                <form method="POST">
+                    {% from "includes/_formhelpers.html" import render_field %}
+                    {{ new_form.csrf_token() }}
+                    {{ render_field(new_form.task_name, class_="form-control") }}
+                    <div>
+                        <button class="btn btn-primary btn-block" type="submit" name="submit-manual" value="/">Continue
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="separate">
+            <h5>Or</h5>
+        </div>
+        <div class="draft">
+            <h4>From Template</h4>
+            <form method="POST" enctype="multipart/form-data">
+                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                {% for draft in draft_list %}
+                    <div class="draft-items">
+                        <b>{{ draft["draft"]["task"]["sentence"] }}</b>
+                        <p>{{ draft["creation_timestamp"] }}</p>
+                        <button type="button" class="btn btn-outline-info" data-toggle="modal"
+                                data-target="{{ "#modal"+loop.index0|string }}"><i class="material-icons">edit</i>
+                        </button>
+                         <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                                data-target="{{ "#delete"+loop.index0|string }}"><i class="material-icons">delete</i>
+                        </button>
+                        <div class="modal fade" id="{{ "modal"+loop.index0|string }}" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        Edit or create a duplicate of {{ draft["draft"]["task"]["sentence"] }}?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                        </button>
+                                        <button type="submit" class="btn btn-info" name="duplicate-draft" value="{{ loop.index0 }}">Duplicate Draft</button>
+                                        <button type="submit" class="btn btn-primary" name="edit-draft" value="{{ loop.index0 }}">Edit Draft</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="{{ "delete"+loop.index0|string }}" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        Confirm deletion of {{ draft["draft"]["task"]["sentence"] }}?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                        </button>
+                                        <button type="submit" class="btn btn-danger" name="delete-draft" value="{{ loop.index0 }}">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/processes/new_process.js") }}"></script>
+{% endblock %}
+

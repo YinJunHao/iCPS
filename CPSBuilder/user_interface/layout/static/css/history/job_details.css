@@ -1,0 +1,34 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "job_details.html"
+ * Written by Yin Jun Hao
+*/
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#table th {
+    background: #303030;
+    color: white;
+    height: 3rem;
+}
+#table span {
+   cursor: pointer;
+   font-size: 1.5rem;
+}
+
+#table td {
+    font-size: 1.5rem;
+    font-weight: 400;
+    height: 5rem;
+}

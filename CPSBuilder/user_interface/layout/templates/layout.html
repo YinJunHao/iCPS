@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/layout.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>IntelligentCPS</title>
+</head>
+<body>
+<nav class="navbar sticky-top navbar-expand-md navbar-custom">
+    <a class="navbar-brand" id="intelligentcps" href="{{ url_for('main.index') }}">IntelligentCPS</a>
+    {% if session['user_id'] %}
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('processes.processes_list' ) }}">Processes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('resources.all_resources' ) }}">Resources</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('start.system_start') }}">Start</a>
+            </li>
+{#            <li class="nav-item">#}
+{#                <a class="nav-link" href="{{ url_for('history.job_history') }}">History</a>#}
+{#            </li>#}
+{#            <li class="nav-item">#}
+{#                <a class="nav-link" href="{{ url_for('running.running_jobs') }}">Running(0)</a>#}
+{#            </li>#}
+        </ul>
+    {% endif %}
+    <ul class="navbar-nav ml-auto">
+        {% if session['user_id'] %}
+            <li>
+                <div class="dropdown show user" id="user-dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#" id="user" aria-haspopup="true" aria-expanded="false">{{ session['user_id'] }}</a>
+                    <div class="dropdown-menu" aria-labelledby="user">
+                        <a class="dropdown-item"  href="{{ url_for("running.running_jobs") }}">Running</a>
+                        <a class="dropdown-item"
+                           href="{{ url_for('user.profile', user_id=session['user_id']) }}">Profile</a>
+                        <a class="dropdown-item" href="{{ url_for('history.job_history') }}">History</a>
+                        <a id="user-button" class="dropdown-item" data-toggle="modal"
+                           data-target="#logout" href="/">Log Out</a>
+                    </div>
+                </div>
+            </li>
+<!--            {#            <li class="nav-item">#}-->
+<!--            {#                <a class="nav-link" href="{{ url_for('users.user', username=session['user_id']) }}">{{ session['user_id'] }}</a>#}-->
+<!--{#            </li>#}-->
+<!--{#            <li class="nav-item">#}-->
+<!--{#                <a id="user-button" class="btn btn-secondary" href="{{ url_for('users.logout') }}">Log Out</a>#}-->
+<!--{#            </li>#}-->
+        {% else %}
+            <li class="login">
+                <a class="btn btn-secondary"
+                   href="{{ url_for('user.register') }}">Register</a>
+            </li>
+            <li class="login">
+                <a class="btn btn-success" href="{{ url_for('user.login') }}">Log In</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{# Logout modal #}
+<div class="modal fade" id="logout" tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                Do you really want to logout?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light"
+                        data-dismiss="modal">Cancel
+                </button>
+                <a type="submit" class="btn btn-secondary"
+                   name="delete" href="{{ url_for('user.logout') }}">Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<div class="content">
+    <main>
+{#        <button class="btn btn-secondary" id="back" onclick="goBack()"><i class="material-icons">keyboard_backspace</i>#}
+{#        </button>#}
+        {% block body %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p id="footer-brand">
+            Department of Mechanical Engineering
+        </p>
+    </footer>
+</div>
+<script type="text/javascript" src="{{ url_for('static', filename='js/layout.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous">
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous">
+</script>
+</body>
+</html>

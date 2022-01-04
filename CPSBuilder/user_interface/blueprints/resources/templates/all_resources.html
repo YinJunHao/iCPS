@@ -1,0 +1,44 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/resources/all_resources.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1>Resources</h1>
+        <p class="lead">
+            Choose which resource type you want to manage
+        </p>
+    </div>
+    <div class="container-fluid">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <ul class="images">
+                <li class="grow">
+                    <button type="submit" name="resource" value="robot"><img
+                            src="{{ url_for("static", filename="images/robotic-arm.png") }}">
+                        <p>Robot</p></button>
+                </li>
+                <li class="grow">
+                    <button type="submit" name="resource" value="hardware"><img
+                            src="{{ url_for("static", filename="images/cpu.png") }}">
+                        <p>Hardware</p></button>
+                </li>
+                <li class="grow">
+                    <button type="submit" name="resource" value="software"><img
+                            src="{{ url_for("static", filename="images/programming.png") }}">
+                        <p>Software</p></button>
+                </li>
+                <li class="grow">
+                    <button type="submit" name="resource" value="location"><img
+                            src="{{ url_for("static", filename="images/placeholder.png") }}">
+                        <p>Location</p></button>
+                </li>
+                <li class="grow">
+                    <button type="submit" name="resource" value="human"><img
+                            src="{{ url_for("static", filename="images/student.png") }}">
+                        <p>Human</p></button>
+                </li>
+            </ul>
+        </form>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,44 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/history/job_history.css") }}">
+
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1>History</h1>
+        <p class="lead">
+            List of all the submitted jobs by {{ session["user_id"] }}
+        </p>
+    </div>
+
+    <div class="container">
+        <input type="text" id="filter-input" onkeyup="filterTable()" placeholder="Type to search...">
+        <table id="table" class="table-striped">
+        <thead>
+            <tr>
+                <th><span id="0" onclick="sortAlphabetically(this.id)">Job ID</span></th>
+                <th><span id="1" onclick="sortAlphabetically(this.id)">Task Name</span></th>
+                <th><span id="2" onclick="sortAlphabetically(this.id)">Status</span></th>
+                <th><span id="3" onclick="sortAlphabetically(this.id)">Date Submitted</span></th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job_status in job_list %}
+                <tr>
+                    <form method="POST">
+                        {{ see_detail_form.csrf_token() }}
+                        {{ see_detail_form.request_id(value = loop.index0) }}
+                        <td class="content">{{ job_status["job_id"] }}</td>
+                        <td class="content">{{ job_status["task_status"][0] }}</td>
+                        <td class="content">{{ job_status["task_status"][1] }}</td>
+                        <td class="content">{{ job_status["job_submission_timestamp"] }}</td>
+                        <td class="content">{{ see_detail_form.see_detail(class_="btn btn-info btn-block") }}</td>
+                    </form>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/history/job_history.js") }}"></script>
+{% endblock %}
+

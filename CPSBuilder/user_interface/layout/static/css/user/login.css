@@ -1,0 +1,39 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * Thi script governs all the styles for the "login.html"
+ * Written by Yin Jun Hao
+*/
+
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+.login-page {
+    font-size: 5rem;
+    max-width: 50rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-group {
+    font-size: 5rem;
+    padding-bottom: 0.5rem;
+}
+input:focus {
+    border-bottom: 0.5rem solid dodgerblue;
+}
+.login-page a, .login-page input, .login-page button {
+    font-size: 1.5rem;
+}
+
+.register {
+    padding-top: 1.5rem;
+}
+.alert {
+    font-size: 2rem;
+}
+.alert span {
+    font-size: 2.5rem;
+}

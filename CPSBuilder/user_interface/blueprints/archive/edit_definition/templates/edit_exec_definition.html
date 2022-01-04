@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Edit Executor Definition</h1>
+    <p class="lead">
+        Change or edit executors from the definition.
+    </p>
+</div>
+<div class="container">
+    <h1 class="lead"><b>Step Selected: {{ step_sentence }}</b></h1>
+    <table class="table-striped" style="width: 50%;" align="center">
+        <tr>
+            <th class="index"></th>
+            <th class="content">Category</th>
+            <th class="content">Item</th>
+        </tr>
+        {% for item in cur_list %}
+        <tr>
+            <td class="index"></td>
+            <td class="content">{{ item[0] }}</td>
+            <td class="content">{{ item[1] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="container">
+        <form method='POST' business=''>
+            <div class="container" style="text-align: left">
+                {{ edit_exec_form.csrf_token() }}
+                {% from "includes/_formhelpers.html" import render_field %}
+                <div class="container">
+                    {{ render_field(edit_exec_form.exec_class, class_="form-control") }}
+                    {{ render_field(edit_exec_form.exec_type, class_="form-control") }}
+                    {{ render_field(edit_exec_form.dependency, class_="form-control") }}
+                    {{ render_field(edit_exec_form.software_id, class_="form-control") }}
+                </div>
+            </div>
+            <div class="container">
+                <p>{{ edit_exec_form.apply_changes(style="width: 80%;", class_="btn btn-dark") }}</p>
+                <p>{{ edit_exec_form.submit_changes(style="width: 80%;", class_="btn btn-primary") }}</p>
+            </div>
+        </form>
+        {% include 'includes/_messages.html' %}
+    </div>
+</div>
+{% endblock %}

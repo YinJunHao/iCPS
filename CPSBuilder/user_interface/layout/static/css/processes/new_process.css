@@ -1,0 +1,68 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "new_process" tab
+ * Written by Yin Jun Hao
+*/
+
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+#new-process {
+    display: flex;
+    justify-content: space-evenly;
+}
+.input-group {
+    display: block; !important;
+}
+#new-process h4,
+#new-process h5 {
+    text-align: center;
+    font-size: 3rem;
+}
+#new-process dt {
+    font-size: 3rem;
+}
+#new-process button {
+    font-size: 2rem;
+}
+.upload-file h5 {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}
+
+.upload-file label {
+    font-size: 2rem;
+}
+#upload {
+    padding-top: 3rem;
+}
+.manual-creation {
+    padding-top: 2rem;
+}
+.manual-creation input {
+    font-size: 2rem;
+}
+#separate {
+    height: 20rem;
+}
+#separate h5 {
+    line-height:10rem;
+}
+
+.draft-items {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 0.1rem solid black;
+}
+
+.draft-items b,
+.draft-items p {
+    font-size: 2rem;
+}
+.draft-items i {
+    font-size: 3rem;
+}

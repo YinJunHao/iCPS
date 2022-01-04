@@ -1,0 +1,44 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/processes/processes_list.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Processes</h1>
+        <p class="lead">
+            Below are the list of available tasks
+        </p>
+    </div>
+    <div class="container">
+        <div>
+            <input onkeyup="filterTask()" type="text" id="filter-input" placeholder="Type to search process..."/>
+            <a href="{{ url_for("processes.new_process") }}" class="btn btn-primary" id="new">New Process</a>
+            <div id="task-list">
+                {% for task in task_list %}
+                    {% set outer_loop = loop %}
+                    {% for details in task_details %}
+                            <a href="{{ url_for('processes.process', task=task[0]) }}"
+                               class="task">
+                                <div class="task-details" id="task-details">
+                                    <h3>{{ details['sentence'] }}</h3>
+                                    <p>Created by: {{ details["created_by"] }}</p>
+                                    <p>Last Update By: {{ details["last_updated_by"] }}</p>
+                                    <p>Last Update By: {{ details["last_update"] }} </p>
+                                </div>
+                                <div class="preview-details">
+                                    <h3 class="replace-underscore">{{ details["content_layer"] }}</h3>
+                                    {% for content in details["content"] %}
+                                        <p>{{ content["sentence"] }}</p>
+                                    {% endfor %}
+                                </div>
+                                <div class="preview" onmouseout="closePreview(this)" onmouseover="seePreview(this)">
+                                    <p>Preview</p>
+                                </div>
+                            </a>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/processes/processes_list.js") }}"></script>
+{% endblock %}
+

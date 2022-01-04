@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">List of Registered Actions</h1>
+    <p class="lead">
+        These are all the registered actions and step definitions.
+    </p>
+</div>
+<div>
+    <div class="container" style="align-self: center; align-content: center">
+
+        {% for task in task_list %}
+            {% set outer_loop = loop %}
+            <p class="lead" style="text-align: left">{{ task[1] }}</p>
+            <table class="table-striped" style="width: 100%;">
+                <tr>
+                    <th class="index"></th>
+                    <th class="content">Action</th>
+                <th class="content" style="text-align: center"></th>
+            </tr>
+
+            {% for action_pair in action_list[outer_loop.index0] %}
+            <form method='POST'>
+                <tr>
+                    {{ edit_action_form.csrf_token() }}
+                    {{ edit_action_form.action_request_id(value = loop.index0) }}
+                    {{ edit_action_form.task_request_id(value = outer_loop.index0) }}
+                    <td class="index">{{ loop.index }}</td>
+                    <td class="content">{{ action_pair[1] }}</td>
+                    <td class="content" style="text-align: center">{{ edit_action_form.edit_item(style="width: 100%;",
+                        class_="btn btn-primary btn-blk") }}</td>
+                </tr>
+            </form>
+            {% endfor %}
+
+        </table>
+        <form method='POST'>
+            {{ delete_action_form.csrf_token() }}
+            {{ delete_action_form.request_id(value = outer_loop.index0) }}
+            {{ delete_action_form.edit_task(style="width: 100%;", class_="btn btn-success btn-blk") }}
+
+            <button type="button" class="btn btn-dark btn-blk" style="width: 100%;" data-toggle="modal" data-target="#{{ task[0] }}">
+                Delete {{ task[1] }}
+            </button>
+
+            <div class="modal fade" id="{{ task[0] }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Confirm Deletion</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Delete {{ task[1] }}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            {{ delete_action_form.delete_item(class_="btn btn-danger") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        {% endfor %}
+        <p>{% include 'includes/_messages.html' %}</p>
+    </div>
+    <div class="container">
+        <form method='POST'>
+            {{ add_task_form.csrf_token() }}
+            {{ add_task_form.add_task(style="width:50%", class_="btn btn-secondary") }}
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/resources/resource.css") }}">
+{% extends "layout.html" %}
+{% block body %}
+    <div class="header">
+        <h1>{{ resource_class }} Resources</h1>
+        <p class="lead">
+            Manage all {{ resource_class }} resources here.
+        </p>
+    </div>
+    {#    Primary table and information#}
+    <div class="container">
+        <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div>
+                <input onkeyup="filterTable()" type="text" id="filter-input" placeholder="Type to search..."/>
+                <button type="submit" name="new" value="/" class="btn btn-primary" id="add">Add</button>
+            </div>
+            <div>
+                <table id="table" class="table-striped">
+                    <thead>
+                    <tr>
+                        <th id="table-first"></th>
+                        <th><span id="1" onclick="sortAlphabetically(this.id)">ID</span></th>
+                        <th><span id="2" onclick="sortAlphabetically(this.id)">Name</span></th>
+                        <th><span id="3" onclick="sortAlphabetically(this.id)">Type</span></th>
+                        {% if resource_class in ["robot", "hardware", "human"] %}
+                            <th><span id="4" onclick="sortAlphabetically(this.id)">Online</span></th>
+                            <th><span id="5" onclick="sortAlphabetically(this.id)">Active</span></th>
+                            <th><span id="6" onclick="sortAlphabetically(this.id)">Available</span></th>
+                        {% elif resource_class == "software" %}
+                            <th><span id="4" onclick="sortAlphabetically(this.id)">Parameters</span></th>
+                            <th><span id="5" onclick="sortAlphabetically(this.id)">States</span></th>
+                            <th><span id="6" onclick="sortAlphabetically(this.id)">Directory</span></th>
+                        {% else %}
+                            <th><span id="4" onclick="sortAlphabetically(this.id)">Position</span></th>
+                            <th><span id="5" onclick="sortAlphabetically(this.id)">Active</span></th>
+                            <th><span id="6" onclick="sortAlphabetically(this.id)">Available</span></th>
+                        {% endif %}
+                        <th><span>Action</span></th>
+                    </tr>
+                    </thead>
+                    <tbody class="content">
+                    {% for resource_details in resourcedb %}
+                        <tr>
+                            <td><i id="more-details-icon" onclick="moreDetails({{ loop.index }}, this)"
+                                   class="material-icons">expand_more</i>
+                            </td>
+                            <td>{{ resource_details["ID"] }}</td>
+                            <td>{{ resource_details["name"] }}</td>
+                            <td>{{ resource_details["type"] }}</td>
+                            {% if resource_class in ["robot", "hardware", "human"] %}
+                                {% if resource_details["online"] == False %}
+                                    <td class="inactive"><i class="material-icons">
+                                        remove_circle
+                                    </i></td>
+                                {% else %}
+                                    <td class="active"><i class="material-icons">
+                                        check_circle
+                                    </i></td>
+                                {% endif %}
+                                {% if resource_details["active"] == False %}
+                                    <td class="inactive"><i class="material-icons">
+                                        remove_circle
+                                    </i></td>
+                                {% else %}
+                                    <td class="active"><i class="material-icons">
+                                        check_circle
+                                    </i></td>
+                                {% endif %}
+                                {% if resource_details["available"] == False %}
+                                    <td class="inactive"><i class="material-icons">
+                                        remove_circle
+                                    </i></td>
+                                {% elif resource_details["available"] == None %}
+                                    <td class="undetermined"><i class="material-icons">help_outline</i></td>
+                                {% else %}
+                                    <td class="active"><i class="material-icons">
+                                        check_circle
+                                    </i></td>
+                                {% endif %}
+                            {% elif resource_class == "software" %}
+                                <td>
+                                    {% for param in resource_details["param_var"] %}
+                                        {{ param }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td>{% for state in resource_details["state_var"] %}
+                                        {{ state }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ resource_details["directory"] }}</td>
+                            {% else %}
+                                <td>x min: {{ resource_details["position"]["x_min"] }} x max: {{ resource_details["position"]["x_max"] }}<br>
+                                    y min: {{ resource_details["position"]["y_min"] }} y max: {{ resource_details["position"]["y_max"] }}<br>
+                                    z min: {{ resource_details["position"]["z_min"] }} z max: {{ resource_details["position"]["z_max"] }}<br>
+                                </td>
+                                {% if resource_details["active"] == False %}
+                                    <td class="inactive"><i class="material-icons">
+                                        remove_circle
+                                    </i></td>
+                                {% else %}
+                                    <td class="active"><i class="material-icons">
+                                        check_circle
+                                    </i></td>
+                                {% endif %}
+                                {% if resource_details["available"] == False %}
+                                    <td class="inactive"><i class="material-icons">
+                                        remove_circle
+                                    </i></td>
+                                {% elif resource_details["available"] == None %}
+                                    <td class="undetermined"><i class="material-icons">help_outline</i></td>
+                                {% else %}
+                                    <td class="active"><i class="material-icons">
+                                        check_circle
+                                    </i></td>
+                                {% endif %}
+                            {% endif %}
+                            <td>
+                                <div class="dropright">
+                                    <i id="more" class="material-icons" data-toggle="dropdown">more_horiz</i>
+                                    <ul id="dropdown-menu" class="dropdown-menu">
+                                        {% if resource_class in ["robot", "hardware", "human", "location"] %}
+                                            {% if resource_details["active"] == False %}
+                                                <li>
+                                                    <button type="submit" class="btn btn-outline-success"
+                                                            name="activate"
+                                                            value="{{ loop.index0 }}"><i class="material-icons">work</i>Activate
+                                                        Resource
+                                                    </button>
+                                                </li>
+                                            {% else %}
+                                                <li>
+                                                    <button class="btn btn-outline-warning custom-btn" type="submit"
+                                                            name="deactivate"
+                                                            value="{{ loop.index0 }}"><i
+                                                            class="material-icons">work_off</i>Deactivate
+                                                        Resource
+                                                    </button>
+                                                </li>
+                                            {% endif %}
+                                        {% endif %}
+                                        <li>
+                                            <button class="btn btn-outline-info" type="submit" name="edit"
+                                                    value="{{ loop.index0 }}"><i
+                                                    class="material-icons">edit</i>Edit
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                                                    data-target="{{ "#delete"+loop.index0|string }}"><i
+                                                    class="material-icons">delete</i>Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="more-details" id="_{{ loop.index }}">
+                            <td></td>
+                            {% if resource_class in ["robot", "hardware", "human"] %}
+                                <td>Location ID:</td>
+                                <td>{{ resource_details["location_id"] }}
+                                <td>PositionSensorTag:</td>
+                                <td>{{ resource_details["coordinate"]["position_sensor_tag"] }}</td>
+                                <td>Last updated by & Date Time:</td>
+                                <td>{{ resource_details["last_updated_by"] }}<br>
+                                    {{ resource_details["last_update"] }}
+                                </td>
+                                <td></td>
+                            {% elif resource_class == "software" %}
+                                <td>Cyber Twin List:</td>
+                                <td>
+                                    {% for cyber_twin in resource_details["cyber_twin"] %}
+                                        {{ cyber_twin }}<br>
+                                    {% endfor %}
+                                </td>
+                                <td>Last updated by:</td>
+                                <td>{{ resource_details["last_updated_by"] }}</td>
+                                <td>Last updated Date Time:</td>
+                                <td>{{ resource_details["last_update"] }}</td>
+                                <td></td>
+                            {% else %}
+                                <td>Orientation:</td>
+                                <td>α: {{ resource_details["orientation"]["alpha"] }}<br>
+                                    β: {{ resource_details["orientation"]["beta"] }}<br>
+                                    γ: {{ resource_details["orientation"]["gamma"] }}
+{#                                <td>Size:</td>#}
+{#                                <td>Length: {{ resource_details["size"]["length"] }}<br>#}
+{#                                    Width: {{ resource_details["size"]["width"] }}<br>#}
+{#                                    Height:{{ resource_details["size"]["height"] }}#}
+{#                                </td>#}
+                                <td>Last updated by & Date Time:</td>
+                                <td>{{ resource_details["last_updated_by"] }}<br>
+                                    {{ resource_details["last_update"] }}
+                                </td>
+                                <td></td>
+                            {% endif %}
+                        </tr>
+                        <div class="modal fade" id="{{ "delete"+loop.index0|string }}" tabindex="-1"
+                             role="dialog"
+                             aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        Confirm deletion of {{ resource_details["name"] }}?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close
+                                        </button>
+                                        <button type="submit" class="btn btn-danger"
+                                                name="delete" value="{{ loop.index0 }}">Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/resources/resource.js") }}"></script>
+{% endblock %}
+

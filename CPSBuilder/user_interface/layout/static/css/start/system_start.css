@@ -1,0 +1,97 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "system_start.html" tab
+ * Written by Yin Jun Hao
+*/
+
+/*system_start.html*/
+.message {
+    width: 95%;
+    margin: auto;
+}
+.alert {
+    font-size: 2rem;
+}
+.alert button {
+    font-size: 4rem;
+}
+#start-page {
+    display: flex;
+    padding: 2rem;
+}
+.cover-heading {
+    text-transform: capitalize;
+}
+.header {
+    margin-left: 3rem;
+}
+.avail-task {
+    width: 50%;
+}
+
+.avail-task label {
+    font-size: 2rem;
+}
+
+.avail-task select,
+.avail-task option,
+.avail-task button {
+    font-size: 1.5rem;
+}
+.avail-task-details {
+    border: 0.2rem solid black;
+    height: 40rem;
+}
+.task-details {
+    padding: 1rem;
+    display: none;
+}
+.task-details h5 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.task-details h6,
+.task-details p,
+.task-details li {
+    font-size: 1.5rem;
+}
+
+.new-job {
+    width: 50%;
+}
+.new-job label {
+    font-size: 2rem;
+}
+
+.new-job button,
+.new-job input {
+    font-size: 1.5rem;
+}
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#table-first {
+    width: 1rem;
+    padding: 0.2rem;
+}
+
+th {
+    background: #303030;
+    color: white;
+    height: 3rem;
+    font-size: 1.5rem;
+}
+span {
+   cursor: pointer;
+}
+td{
+    height: 5rem;
+    font-weight: 400;
+    font-size: 1.5rem;
+}

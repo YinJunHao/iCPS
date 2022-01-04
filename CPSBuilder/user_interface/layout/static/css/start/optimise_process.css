@@ -1,0 +1,112 @@
+.cover-heading {
+    text-transform: capitalize;
+}
+.header {
+    text-align: center;
+}
+#optimise-process-page {
+    text-align: center;
+    margin-top: 8rem;
+}
+.tree-content {
+    justify-content: center;
+}
+
+.row-tree {
+    justify-content: center;
+    height: 8rem;
+    line-height: 8rem;
+    display: flex;
+    padding: 1rem;
+    margin-bottom: 12rem;
+}
+
+.layer-heading {
+    font-weight: bold;
+    font-size: 2rem;
+    text-transform: capitalize;
+    left: 5%;
+    position: absolute;
+}
+
+.tree-detail {
+    justify-content: center;
+    text-align: center;
+    color: white;
+    margin: auto auto;
+    color: white;
+    height: 8rem;
+    width: 10rem;
+    /*position: absolute;*/
+}
+
+
+.optimised {
+    background: #007E33;
+    font-size: 2.5rem;
+}
+
+.not-optimised {
+    background: #FF8800;
+    font-size: 2.5rem;
+}
+
+.optimised button {
+    display: none;
+    color: white;
+    border-radius: 0.2rem;
+    outline: none;
+    border-style: hidden;
+    height: 4rem;
+    width: 10rem;
+    font-size: 1.25rem;
+}
+
+.not-optimised button {
+    display: none;
+    color: white;
+    border-radius: 0.2rem;
+    outline: none;
+    border-style: hidden;
+    height: 4rem;
+    width: 10rem;
+    font-size: 1.25rem;
+}
+
+.svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    stroke-width: 0.25rem;
+    stroke: rgb(0, 0, 0);
+    cursor: default;
+    z-index: -2;
+}
+
+#all-list-button {
+    left: 2%;
+    z-index: 100;
+    position: absolute;
+
+}
+#all-list-button a {
+    color: dimgrey;
+    text-decoration: none;
+}
+#back-icon {
+    font-size: 6rem;
+    vertical-align: bottom;
+}
+
+#back-name {
+    font-size: 4rem;
+    vertical-align: bottom;
+}
+
+#all-list-button a:hover {
+    color: black;
+    cursor: pointer;
+    text-shadow: 0.05rem 0.05rem;
+}

@@ -1,0 +1,65 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/start/system_start.css') }}">
+{% extends 'layout.html' %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Start a new job</h1>
+        <p class="lead">
+            Execute a job with the IntelligentCPS
+        </p>
+    </div>
+    <div class="message">
+        {% include "includes/_messages.html" %}
+    </div>
+    <div id="start-page">
+        {% from "includes/_formhelpers.html" import render_field %}
+        <div class="avail-task">
+            <div class="container">
+                {{ new_job.csrf_token() }}
+                {{ render_field(new_job.available_task, class_="form-control", id="avail-task", onchange="displayDetails()") }}
+                <div class="avail-task-details" id="avail-task-details">
+                    {% for task in task_details %}
+                        {% if task != "" %}
+                            <div class="task-details" id="{{ task["_id"] }}">
+                                <h5>{{ task["sentence"] }}</h5>
+                                <p>Last Update: {{ task["last_update"] }}</p>
+                                <h6>Content Layer: {{ task["content_layer"] }}</h6>
+                                <ul>
+                                {% for content in task["content"] %}
+                                    <li>{{ content["sentence"] }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary btn-block" onclick="addTask()">Add</button>
+            </div>
+        </div>
+        <div class="new-job">
+            <div class="container">
+                <form method="POST">
+                    {{ new_job.csrf_token() }}
+                    {{ render_field(new_job.job_name, class_="form-control") }}
+                    <table id="table" class="table-striped">
+                        <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Task Name</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <br>
+                    <button id="continue" onclick="jobList()" class="btn btn-success btn-block" type="submit"
+                            name="continue">Continue
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/start/system_start.js') }}"></script>
+{% endblock %}

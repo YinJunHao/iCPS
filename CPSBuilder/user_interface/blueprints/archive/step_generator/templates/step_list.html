@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">iCPS Optimizer</h1>
+    <p class="lead">
+        iCPS finds and suggests to user optimized manufacturing
+        methods in compliance with CGMP and ISO regulations.
+    </p>
+    <p class="lead">
+        Select which steps to keep and click Regenerate Step to change the remaining steps.
+    </p>
+    <p class="lead">
+        Click Generate Executors once you are satisfied with the generated list.
+    </p>
+</div>
+<div class="container">
+    <h1 class="display-10">Action Selected: {{ session['action_sentence'] }}</h1>
+    <p class="lead">Location: {{ session['location_id'] }}</p>
+</div>
+{% from "includes/_formhelpers.html" import render_field %}
+<div class="container" style="align-content: center">
+    <form method='POST' business=''>
+        {{ form.csrf_token() }}
+        <div class="container" style="text-align: left"></div>
+        {% for subfield in form.step_list %}
+        <div class="container" style="text-align: left">
+            <label> {{ subfield }} </label>
+            {{ loop.index }}. {{ subfield.label }}
+        </div>
+        {% endfor %}
+</div>
+<p>
+    <button class="btn btn-secondary" name="step_gen" value="regen_step">Regenerate Step</button>
+    <button class="btn btn-primary" name="step_gen" value="gen_exec">Generate Executors</button>
+</p>
+</form>
+{% include 'includes/_messages.html' %}
+</div>
+
+
+{% endblock %}

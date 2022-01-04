@@ -1,0 +1,30 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/user/login.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1 class="cover-heading">Login Here</h1>
+        <p class="lead">
+            Log in with your username and password
+        </p>
+    </div>
+    <div class="login-page">
+        {% from "includes/_formhelpers.html" import render_field %}
+        <form method="POST" business=''>
+            {{ form.csrf_token() }}
+            <div class="form-group">
+                {{ render_field(form.user_id, class_="form-control") }}
+            </div>
+            <div class="form-group">
+                {{ render_field(form.password, class_="form-control") }}
+            </div>
+            <p><button type="submit" class="btn btn-success btn-block" value="LOG IN">LOG IN</button></p>
+        </form>
+        {% include "includes/_messages.html" %}
+        <div class="register">
+            <h2>Don't have an account?</h2>
+            <a class="btn btn-secondary btn-block" href="{{ url_for("user.register") }}">REGISTER</a>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,38 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * Thi script governs all the styles for the "profile.html"
+ * Written by Yin Jun Hao
+*/
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+#profile-page {
+    margin: 0 auto;
+    width: 20%;
+}
+.alert {
+    font-size: 2rem;
+}
+.alert span {
+    font-size: 2.5rem;
+}
+.profile p,
+.profile b,
+.profile button {
+    font-size: 2rem;
+    display: inline;
+}
+.profile button {
+    width: 18rem;
+}
+span {
+    display: block;
+    padding: 2rem 0;
+}
+
+#action-buttons {
+    text-align: center;
+}

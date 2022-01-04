@@ -1,0 +1,81 @@
+.header {
+    text-align: center;
+}
+
+#optimise-step-page {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+td {
+    height: 4rem;
+    font-weight: 400;
+    font-size: 1.5rem;
+}
+
+th {
+    background: #303030;
+    color: white;
+    height: 3rem;
+    font-size: 1.5rem;
+}
+
+h3 {
+    text-align: center;
+}
+
+.state-exec-classification {
+    font-size: 3rem;
+    text-transform: capitalize;
+}
+
+#parameter {
+    display: flex;
+    width: 30%;
+}
+
+
+#executor-selection {
+    padding-top: 2rem;
+}
+#executor-selection-heading {
+    text-align: center;
+}
+#parameter select,
+#parameter option,
+#executor-selection p {
+    font-size: 2rem;
+}
+
+#same-as-exec-index,
+#same-as-step-index {
+    /*display: flex;*/
+    width: 20%;
+}
+
+#same-as-exec-index select,
+#same-as-exec-index option,
+#same-as-step-index option,
+#same-as-step-index select {
+    font-size: 1.5rem;
+}
+
+
+.action-buttons button {
+    font-size: 1.5rem;
+    width: 18rem;
+}
+
+.action-buttons {
+    margin-right: auto;
+    margin-left: auto;
+    width: 40%;
+    display: flex;
+    justify-content: space-evenly;
+}

@@ -1,0 +1,107 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "resource.html"
+ * Written by Yin Jun Hao
+*/
+
+/*resource.html*/
+
+h1 {
+    text-transform: capitalize;
+}
+
+.header {
+    text-transform: capitalize;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+#filter-input {
+    background-image: url('../../images/searchicon.png'); /* Add a search icon to input */
+    background-size: 1.5rem;
+    background-position: 1rem 1.2rem;
+    background-repeat: no-repeat;
+    width: 30%;
+    font-size: 1.6rem;
+    padding: 1.2rem 2rem 1.2rem 4rem;
+    border: 0.2rem solid #ddd;
+    margin-bottom: 1rem;
+}
+#add {
+    float: right;
+    margin: 1.5rem 0.5rem 0 0;
+    font-size: 1.5rem;
+}
+
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+span {
+   cursor: pointer;
+}
+td{
+    width: 5rem;
+    margin-left: 2rem;
+}
+#table th {
+    background: #303030;
+    color: white;
+    height: 3rem;
+}
+#table span {
+   cursor: pointer;
+   font-size: 1.5rem;
+}
+
+
+#table td {
+    font-size: 1.5rem;
+    font-weight: 400;
+    height: 5rem;
+}
+.inactive {
+    color: #CC0000;
+    font-weight: 500;
+}
+.active {
+    color: #007E33;
+    font-weight: 500;
+}
+.undetermined {
+    color: #FF8800;
+    font-weight: 500;
+}
+
+/*table actions*/
+#more {
+    cursor: pointer;
+}
+#dropdown-menu {
+    padding: 0;
+}
+
+.dropdown-menu button {
+    padding: 1.5rem 0.5rem;
+    width: 20rem;
+    text-align: left;
+    border-radius: 0;
+    font-size: 1.5rem;
+}
+.btn-outline-warning.custom-btn:hover {
+    color:white;
+}
+
+/*For more details*/
+#more-details-icon {
+    cursor: pointer;
+}
+
+.more-details {
+    display: none;
+    text-align: center;
+}

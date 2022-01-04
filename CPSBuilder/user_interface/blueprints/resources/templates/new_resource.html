@@ -1,0 +1,391 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for("static",filename="css/resources/new_resource.css") }}">
+{% extends "layout.html" %}
+
+{% block body %}
+    <div class="header">
+        <h1>Add New {{ resource_class }}</h1>
+        <p class="lead">
+            Enter details for the new {{ resource_class }} resource
+        </p>
+    </div>
+    <div id="draft-page">
+        <p class="draft-header">Drafts</p>
+        {% for draft in draft_list %}
+            <div class="draft">
+                <div class="draft-details">
+                    {{ draft["name"] }}<br>
+                    {{ draft["type"] }}<br>
+                    {{ draft["last_update"] }}
+                </div>
+                <div class="draft-actions">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-outline-info" name="edit-draft"
+                                value="{{ loop.index0 }}"><i class="material-icons">edit</i>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-outline-danger" data-toggle="modal"
+                            data-target="{{ "#delete"+loop.index0|string }}"><i class="material-icons">delete</i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal fade" id="{{ 'delete'+loop.index0|string }}" tabindex="-1"
+                 role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            Confirm deletion of {{ draft["name"] }}?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-dismiss="modal">Close
+                            </button>
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-danger"
+                                        name="delete-draft" value="{{ loop.index0 }}">Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="container" id="add-page">
+        {% include "includes/_messages.html" %}
+        <form method="POST">
+            {% from "includes/_formhelpers.html" import render_field %}
+            {{ form.csrf_token() }}
+            {#  Adding new resource  #}
+            {% if not session["update_resource_draft"] and not session["update_new_resource"] %}
+                {{ render_field(form.name, class_="form-control") }}
+                <div class="form-row">
+                    <div class="col">
+                        {{ render_field(form.type, class_="form-control") }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.type_new, class_="form-control") }}
+                    </div>
+                </div>
+                {% if resource_class in ["robot", "hardware", "human"] %}
+                    <div class="form-row">
+                        <div class="col">
+                            {{ render_field(form.position_sensor_tag, class_="form-control", value="none") }}
+                        </div>
+                        <div class="col">
+                            {{ render_field(form.location_id, class_="form-control") }}
+                        </div>
+                    </div>
+                    {{ render_field(form.status, class_="form-control") }}
+<!--                    <p class="label-header">Position</p>-->
+<!--                    <div class="form-inline">-->
+<!--                        {{ form.position_x.label(class_="sub-label") }}-->
+<!--                        {{ form.position_x(class_="form-control") }}-->
+<!--                        {{ form.position_y.label(class_="sub-label") }}-->
+<!--                        {{ form.position_y(class_="form-control") }}-->
+<!--                        {{ form.position_z.label(class_="sub-label") }}-->
+<!--                        {{ form.position_z(class_="form-control") }}-->
+<!--                    </div>-->
+                {% elif resource_class == "software" %}
+                    <div class="form-row">
+                        <div class="col">
+                            <div id="params">
+                                <dt>
+                                    {{ form.param.label }}
+                                </dt>
+                                <div class="new-variable">
+                                    <dd>
+                                        {{ form.param(class_="form-control") }}
+                                    </dd>
+                                </div>
+                            </div>
+                            <i class="material-icons add-variable" onclick="addVariable('params')">
+                                add_circle
+                            </i>
+                        </div>
+                        <div class="col">
+                            <div id="states">
+                                <dt>
+                                    {{ form.state.label }}
+                                </dt>
+                                <div class="new-variable">
+                                    <dd>
+                                        {{ form.state(class_="form-control") }}
+                                    </dd>
+                                </div>
+                            </div>
+                            <i class="material-icons add-variable" onclick="addVariable('states')">
+                                add_circle
+                            </i>
+                        </div>
+                    </div>
+                    <div class="physical-resource-for-software" id="physical-resource-for-software">
+                        <dt>
+                            <label>Software for Following Physical Resource/s</label>
+                        </dt>
+                            <table class="table" id="table">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Name</th>
+                                        <th class="delete-column"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="add-physical-resource">
+                                <tr>
+                                    <td>
+                                        <dd>
+                                            <select class="form-control" name="physical-resource-class" onchange="populateOptions({{ physical_resource|safe }}, this.id, this.value)" id="physical-resource-class-1">
+                                                <option value=""></option>
+                                                <option value="robot">robot</option>
+                                                <option value="hardware">hardware</option>
+                                                <option value="human">human</option>
+                                            </select>
+                                        </dd>
+                                    </td>
+                                    <td>
+                                        <dd>
+                                            <select class="form-control" name="physical-resource-id" id="physical-resource-choice-1">
+                                                <option value=""></option>
+                                            </select></dd>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><i class="material-icons add-variable" onclick="addPhysicalResource({{ physical_resource|safe }})">
+                                    add_circle
+                                </i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                {% else %}
+                    <div id="help-row"><p class="label-header">Position</p><span id="location-reference-icon" data-toggle="modal" data-target="#location-reference" class="material-icons">help</span></div>
+                     <div class="form-inline position">
+                            {{ form.position_x_min.label(class_="sub-label") }}
+                            {{ form.position_x_min(class_="form-control") }}
+                            {{ form.position_x_max.label(class_="sub-label") }}
+                            {{ form.position_x_max(class_="form-control") }}
+                     </div>
+                    <div class="form-inline position">
+                            {{ form.position_y_min.label(class_="sub-label") }}
+                            {{ form.position_y_min(class_="form-control") }}
+                            {{ form.position_y_max.label(class_="sub-label") }}
+                            {{ form.position_y_max(class_="form-control") }}
+                     </div>
+                    <div class="form-inline">
+                            {{ form.position_z_min.label(class_="sub-label") }}
+                            {{ form.position_z_min(class_="form-control") }}
+                            {{ form.position_z_max.label(class_="sub-label") }}
+                            {{ form.position_z_max(class_="form-control") }}
+                     </div>
+                    <p class="label-header">Orientation (Default 0)</p>
+                    <div class="form-inline">
+                        {{ form.alpha.label(class_="sub-label") }}
+                        {{ form.alpha(class_="form-control", value=0) }}
+                        {{ form.beta.label(class_="sub-label") }}
+                        {{ form.beta(class_="form-control", value=0) }}
+                        {{ form.gamma.label(class_="sub-label") }}
+                        {{ form.gamma(class_="form-control", value=0) }}
+                    </div>
+{#                    <p class="label-header">Size</p>#}
+{#                    <div class="form-inline">#}
+{#                        {{ form.length.label(class_="sub-label") }}#}
+{#                        {{ form.length(class_="form-control") }}#}
+{#                        {{ form.width.label(class_="sub-label") }}#}
+{#                        {{ form.width(class_="form-control") }}#}
+{#                        {{ form.height.label(class_="sub-label") }}#}
+{#                        {{ form.height(class_="form-control") }}#}
+{#                    </div>#}
+                {% endif %}
+                {# update draft  #}
+            {% else %}
+                {{ render_field(form.name, class_="form-control", value=session["resource_draft"]["name"]) }}
+                <div class="form-row">
+                    <div class="col">
+                        {{ render_field(form.type, class_="form-control", value=session["resource_draft"]["type"]) }}
+                    </div>
+                    <div class="col">
+                        {{ render_field(form.type_new, class_="form-control", value=session["resource_draft"]["type_new"]) }}
+                    </div>
+                </div>
+                {% if resource_class in ["robot", "hardware", "human"] %}
+                    <div class="form-row">
+                        <div class="col">
+                            {{ render_field(form.position_sensor_tag, class_="form-control", value=session["resource_draft"]["position_sensor_tag"]) }}
+                        </div>
+                        <div class="col">
+                            {{ render_field(form.location_id, class_="form-control", value=session["resource_draft"]["location_id"]) }}
+                        </div>
+                    </div>
+                        {{ render_field(form.status, class_="form-control", value=session["resource_draft"]["status"]) }}
+<!--                    <p class="label-header">Position</p>-->
+<!--                    <div class="form-inline">-->
+<!--                        {{ form.position_x.label(class_="sub-label") }}-->
+<!--                        {{ form.position_x(class_="form-control", value=session["resource_draft"]["x"]) }}-->
+<!--                        {{ form.position_y.label(class_="sub-label") }}-->
+<!--                        {{ form.position_y(class_="form-control", value=session["resource_draft"]["y"]) }}-->
+<!--                        {{ form.position_z.label(class_="sub-label") }}-->
+<!--                        {{ form.position_z(class_="form-control", value=session["resource_draft"]["z"]) }}-->
+<!--                    </div>-->
+                {% elif resource_class == "software" %}
+                    <div class="form-row">
+                        <div class="col">
+                            <div id="params">
+                                <dt>
+                                    {{ form.param.label }}
+                                </dt>
+                                {% for param in session["resource_draft"]["param"] %}
+                                    <div class="new-variable">
+                                        <dd>
+                                            {{ form.param(class_="form-control", value=param) }}
+                                        </dd>
+                                        {% if loop.index != 1 %}
+                                            <icon class="material-icons remove-variable" onclick="removeElement(this)">
+                                                remove_circle
+                                            </icon>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <i class="material-icons add-variable" onclick="addVariable('params')">
+                                add_circle
+                            </i>
+                        </div>
+                        <div class="col">
+                            <div id="states">
+                                <dt>
+                                    {{ form.state.label }}
+                                </dt>
+                                {% for state in session["resource_draft"]["state"] %}
+                                    <div class="new-variable">
+                                        <dd>
+                                            {{ form.state(class_="form-control", value=state) }}
+                                        </dd>
+                                        {% if loop.index != 1 %}
+                                            <icon class="material-icons remove-variable" onclick="removeElement(this)">
+                                                remove_circle
+                                            </icon>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <i class="material-icons add-variable" onclick="addVariable('states')">
+                                add_circle
+                            </i>
+                        </div>
+                    </div>
+                    <div class="physical-resource-for-software" id="physical-resource-for-software">
+                        <dt>
+                            <label>Software for Following Physical Resource/s</label>
+                        </dt>
+                            <table class="table" id="table">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Name</th>
+                                        <th class="delete-column"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="add-physical-resource">
+                                <tr>
+                                    <td>
+                                        <dd>
+                                            <select class="form-control" name="physical-resource-class" onchange="populateOptions({{ physical_resource|safe }}, this.id, this.value)" id="physical-resource-class-1">
+                                                <option value=""></option>
+                                                <option value="robot">robot</option>
+                                                <option value="hardware">hardware</option>
+                                                <option value="human">human</option>
+                                            </select>
+                                        </dd>
+                                    </td>
+                                    <td>
+                                        <dd>
+                                            <select class="form-control" name="physical-resource-id" id="physical-resource-choice-1">
+                                                <option value=""></option>
+                                            </select></dd>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2"><i class="material-icons add-variable" onclick="addPhysicalResource({{ physical_resource|safe }})">
+                                    add_circle
+                                </i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                    </div>
+                {% else %}
+                    <div id="help-row"><p class="label-header">Position</p><span id="location-reference-icon" data-toggle="modal" data-target="#location-reference" class="material-icons">help</span></div>
+                    <div class="form-inline position">
+                            {{ form.position_x_min.label(class_="sub-label") }}
+                            {{ form.position_x_min(class_="form-control", value=session["resource_draft"]["position_x_min"]) }}
+                            {{ form.position_x_max.label(class_="sub-label") }}
+                            {{ form.position_x_max(class_="form-control", value=session["resource_draft"]["position_x_max"]) }}
+                     </div>
+                    <div class="form-inline position">
+                            {{ form.position_y_min.label(class_="sub-label") }}
+                            {{ form.position_y_min(class_="form-control", value=session["resource_draft"]["position_y_min"]) }}
+                            {{ form.position_y_max.label(class_="sub-label") }}
+                            {{ form.position_y_max(class_="form-control", value=session["resource_draft"]["position_y_max"]) }}
+                     </div>
+                    <div class="form-inline">
+                            {{ form.position_z_min.label(class_="sub-label") }}
+                            {{ form.position_z_min(class_="form-control", value=session["resource_draft"]["position_z_min"]) }}
+                            {{ form.position_z_max.label(class_="sub-label") }}
+                            {{ form.position_z_max(class_="form-control", value=session["resource_draft"]["position_z_max"]) }}
+                     </div>
+                    <p class="label-header">Orientation (Default 0)</p>
+                    <div class="form-inline">
+                        {{ form.alpha.label(class_="sub-label") }}
+                        {{ form.alpha(class_="form-control", value=session["resource_draft"]["alpha"]) }}
+                        {{ form.beta.label(class_="sub-label") }}
+                        {{ form.beta(class_="form-control", value=session["resource_draft"]["beta"]) }}
+                        {{ form.gamma.label(class_="sub-label") }}
+                        {{ form.gamma(class_="form-control", value=session["resource_draft"]["gamma"]) }}
+                    </div>
+{#                    <p class="label-header">Size</p>#}
+{#                    <div class="form-inline">#}
+{#                        {{ form.length.label(class_="sub-label") }}#}
+{#                        {{ form.length(class_="form-control", value=session["resource_draft"]["length"]) }}#}
+{#                        {{ form.width.label(class_="sub-label") }}#}
+{#                        {{ form.width(class_="form-control", value=session["resource_draft"]["width"]) }}#}
+{#                        {{ form.height.label(class_="sub-label") }}#}
+{#                        {{ form.height(class_="form-control", value=session["resource_draft"]["height"]) }}#}
+{#                    </div>#}
+                {% endif %}
+            {% endif %}
+            <div class="modal fade" id="location-reference" tabindex="-1"
+                 role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h1 id="location-reference-heading">Location Reference</h1>
+                            <img id="location-reference-picture"
+                            src='{{ url_for("static", filename="images/location_reference.jpg") }}'>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-dismiss="modal">Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="add-actions">
+                <button class="btn btn-light" name="cancel" value="/">Cancel</button>
+                {% if session["update_resource_draft"] %}
+                    <button class="btn btn-info" type="submit" name="update-draft" value="/">Update Draft</button>
+                {% else %}
+                    <button class="btn btn-secondary" type="submit" name="save-draft" value="/">Save as Draft</button>
+                {% endif %}
+                <button class="btn btn-primary" type="submit" name="add-new" value="/">Add New Resource</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript" src="{{ url_for("static", filename="js/resources/new_resource.js") }}"></script>
+{% endblock %}
+

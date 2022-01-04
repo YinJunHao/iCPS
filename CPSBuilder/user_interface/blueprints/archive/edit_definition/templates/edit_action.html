@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Edit Action Definition</h1>
+    <p class="lead">
+        Choose to insert or remove actions from the following definition.
+    </p>
+</div>
+<div class="container">
+    <h1 class="lead"><b>Task selected: {{ task_sentence }}</b></p>
+        <table class="table-striped" style="width: 50%;" align="center">
+            <tr>
+                <th class="index" style="padding-bottom:2px"></th>
+                <th class="content" style="padding-bottom:2px">Action</th>
+            </tr>
+            {% for action in action_sentence_list %}
+            <tr>
+                <td class="index" style="padding-bottom:2px"> {{ loop.index }} </td>
+                <td class="content" style="padding-bottom:2px"> {{ action }} </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p></p>
+        <form method='POST'>
+            {{ edit_element_form.csrf_token() }}
+            {% from "includes/_formhelpers.html" import render_field %}
+            <div class="container" style="text-align:center; max-width: 475px; align-items: center">
+                <div class="form-group">
+                    <b>{{ edit_element_form.new_element.label }}</b> {{
+                    edit_element_form.new_element(class_="form-control", style="text-align: center") }}
+                </div>
+                <div class="form-group">
+                    <b>{{ edit_element_form.element_idx.label }}</b> {{
+                    edit_element_form.element_idx(class_="form-control", style="text-align: center") }}
+                </div>
+                <p>
+                    {{ edit_element_form.add_element(class_="btn btn-dark", style="width:30%") }}
+                    {{ edit_element_form.remove_element(class_="btn btn-dark", style="width:30%") }}
+                </p>
+                <p>
+                    {{ edit_element_form.submit_configuration(class_="btn btn-primary", style="width:60%") }}
+                    {{ edit_element_form.cancel_edit(class_="btn btn-secondary", style="width:60%") }}</p>
+            </div>
+        </form>
+</div>
+{% endblock %}

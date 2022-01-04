@@ -1,0 +1,61 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "edit_resource.html"
+ * Written by Yin Jun Hao
+*/
+
+.header {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+/*edit_resource.html*/
+#edit-page {
+    width: 50%;
+}
+.edit-actions {
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.edit-actions button {
+    width: 30rem;
+    font-size: 1.5rem;
+}
+
+
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+
+#table th {
+    font-size: 1.5rem;
+    background: #303030;
+    color: white;
+    height: 3rem;
+}
+
+#table td {
+    font-size: 1.5rem;
+    font-weight: 400;
+    height: 5rem;
+}
+
+#table b {
+    font-size: 1.5rem;
+}
+
+#table select, #table option, #table input {
+    font-size: 1.5rem;
+}
+
+.alert {
+    font-size: 2rem;
+}
+

@@ -1,0 +1,100 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "tree.html"
+ * Written by Yin Jun Hao
+*/
+
+#tree-nav {
+    position: relative;
+    z-index: 10;
+    top: 0;
+    left: 0;
+    background: white;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    display: none;
+    text-transform: capitalize;
+    overflow-scrolling: auto;
+}
+
+.tree-content {
+    justify-content: center;
+}
+
+.row-tree {
+    justify-content: center;
+    height: 8rem;
+    line-height: 8rem;
+    display: flex;
+    padding: 1rem;
+    margin-bottom: 12rem;
+}
+
+.row-tree p {
+    width: 20rem;
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.tree-detail {
+    justify-content: center;
+    text-align: center;
+    color: white;
+    margin: auto auto;
+}
+
+.tree-detail button {
+    z-index: 5;
+    color: white;
+    background: #00615A;
+    border-radius: 0.2rem;
+    outline: none;
+    border-style: hidden;
+    height: 10rem;
+    width: 12rem;
+    font-size: 1.5rem;
+}
+
+.tree-detail button:hover {
+    text-decoration: none;
+}
+
+.tree-detail:hover {
+    background: #007B72;
+}
+
+.glow {
+    width: 10rem;
+    height: 8rem;
+    background: #007B72;
+    animation: pulse 0.5s infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 1rem 0.3rem #00998E;
+    }
+    to {
+        box-shadow: 0 0 2rem 0.5rem #00998E;
+    }
+}
+
+.svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    stroke-width: 2px;
+    stroke: rgb(0, 0, 0);
+    z-index: -2;
+    cursor: default;
+}
+
+#close-tree {
+    float: right;
+    margin-right: 50rem;
+    font-size: 1.5rem;
+}

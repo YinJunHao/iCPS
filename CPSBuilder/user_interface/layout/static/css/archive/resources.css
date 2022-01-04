@@ -1,0 +1,224 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "resources" tab
+ * Written by Yin Jun Hao
+*/
+
+/*all_resources.html*/
+.cover-heading {
+    text-align: center;
+}
+
+.images {
+    margin: 30px;
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+    list-style: none;
+}
+.images button {
+    border: none;
+    background: none;
+}
+.images img {
+    width: 250px;
+}
+
+.resources {
+    padding-left: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: space-evenly;
+
+}
+h1 {
+    text-transform: capitalize;
+}
+
+/*resource.html*/
+#filter-input {
+    background-image: url('../../images/searchicon.png'); /* Add a search icon to input */
+    background-size: 15px;
+    background-position: 10px 12px;
+    background-repeat: no-repeat;
+    width: 30%;
+    font-size: 16px;
+    padding: 12px 20px 12px 40px;
+    border: 2px solid #ddd;
+    margin-bottom: 12px;
+}
+
+#add {
+    float: right;
+    margin-top: 16px;
+    margin-right: 5px;
+}
+
+/*table properties*/
+.table-striped {
+    text-align: center;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#table-first {
+    width: 10px;
+    padding: 2px;
+}
+
+th {
+    background: #303030;
+    color: white;
+    height: 30px;
+}
+span {
+   cursor: pointer;
+}
+td{
+    height: 50px;
+    font-weight: 400;
+}
+.inactive {
+    color: #CC0000;
+    font-weight: 500;
+}
+.active {
+    color: #007E33;
+    font-weight: 500;
+}
+.undetermined {
+    color: #FF8800;
+    font-weight: 500;
+}
+
+/*table actions*/
+#more {
+    cursor: pointer;
+}
+#dropdown-menu {
+    padding: 0px;
+}
+
+.dropdown-menu button {
+    padding: 15px 5px;
+    width: 180px;
+    text-align: left;
+    border-radius: 0;
+}
+.btn-outline-warning.custom-btn:hover {
+    color:white;
+}
+
+/*For more details*/
+#more-details-icon {
+    cursor: pointer;
+}
+
+.more-details {
+    display: none;
+    text-align: center;
+}
+
+/*new_resource.html*/
+#draft-page {
+    position: absolute;
+    width: 15%;
+    text-align: center;
+    border: .5px solid darkgrey;
+
+}
+.draft-header {
+    width: 100%;
+    background: #0052A1;
+    color: white;
+    margin: 0;
+}
+.draft {
+    border-bottom: .5px solid darkgrey;
+    background: #CAD1DC;
+
+}
+.draft:hover  {
+    cursor: pointer;
+    background: #2761b2;
+    color: white;
+    visibility: visible;
+}
+.draft:hover .draft-actions {
+    visibility: visible;
+}
+.draft-details {
+    display: inline-block;
+    text-align: center;
+    padding-right: 5px;
+}
+
+.draft-actions {
+    display: inline-block;
+    text-align: center;
+    padding-top: 10px;
+    visibility: hidden;
+}
+
+#add-page {
+    width: 45%;
+}
+
+.label-header {
+    font-weight: 700;
+    padding-top: 10px;
+}
+
+.sub-label {
+    margin: 0 15px;
+}
+
+.add-variable {
+    color: #0275d8;
+    cursor: pointer;
+}
+.remove-variable {
+    color: #d9534f;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.new-variable {
+    display: flex;
+}
+
+#params dd {
+    width: 80%;
+}
+
+#states dd {
+    width: 80%;
+}
+
+.add-actions {
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.add-actions button {
+    width: 300px;
+}
+
+/*edit_resource.html*/
+#edit-page {
+    width: 50%;
+}
+.edit-actions {
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.edit-actions button {
+    width: 300px;
+}
+
+

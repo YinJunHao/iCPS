@@ -1,0 +1,22 @@
+/*
+ * Program title: iCPS
+ * Project title: CPS Builder
+ * This script governs all the styles for the "main" tab
+ * Written by Yin Jun Hao
+*/
+#home-page {
+}
+.container {
+    text-align: center;
+    width: 500px;
+}
+.header {
+    text-align: center;
+    margin-top: 8rem;
+}
+#about {
+    margin-top: 8rem;
+    text-align: justify;
+    font-size: 2rem;
+    font-weight: 300;
+}

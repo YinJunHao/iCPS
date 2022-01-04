@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">iCPS Optimizer</h1>
+    <p class="lead">
+        iCPS finds and suggests to user optimized manufacturing methods
+        in compliance with CGMP and ISO rulings.
+    </p>
+</div>
+<div class="row">
+    <div class="container" style="align-self: center; max-width: 475px;">
+        {% from "includes/_formhelpers.html" import render_field %}
+        <form method='POST' business=''>
+            {{ form.csrf_token() }}
+            <div class="form-group">
+                {{render_field(form.task, class_="form-control")}}
+            </div>
+            <p>
+                <button class="btn btn-primary btn-block" name="gen_action" value="confirm">Generate step</button>
+            </p>
+        </form>
+        {% include 'includes/_messages.html' %}
+    </div>
+</div>
+{% endblock %}

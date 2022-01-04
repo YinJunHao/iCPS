@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="jumbotron text-center">
+    <h1 class="cover-heading">Add New Workcell</h1>
+    <p class="lead">
+        Enter details for the new resource.
+    </p>
+</div>
+<div class="container" style="max-width: 500px">
+    <form method="POST" style="text-align: left">
+        {% from "includes/_formhelpers.html" import render_field %}
+        {{ new_workcell.csrf_token() }}
+        {{ render_field(new_workcell.workcell_id, class_="form-control") }}
+        {{ render_field(new_workcell.workcell_id_new, class_="form-control") }}
+        {{ render_field(new_workcell.location_name, class_="form-control") }}
+        <table class="table-striped" style="width: 100%;" align="center">
+            <tr>
+                <th class="content"></th>
+                <th class="content" style="text-align: center">x</th>
+                <th class="content" style="text-align: center">y</th>
+                <th class="content" style="text-align: center">z</th>
+            </tr>
+            <tr>
+                <th class="content">Minimum</th>
+                <td class="content">{{ new_workcell.x_min(class_="form-control", style="text-align: center") }}</td>
+                <td class="content">{{ new_workcell.y_min(class_="form-control", style="text-align: center") }}</td>
+                <td class="content">{{ new_workcell.z_min(class_="form-control", style="text-align: center") }}</td>
+            </tr>
+            <tr>
+                <th class="content">Maximum</th>
+                <td class="content">{{ new_workcell.x_max(class_="form-control", style="text-align: center") }}</td>
+                <td class="content">{{ new_workcell.y_max(class_="form-control", style="text-align: center") }}</td>
+                <td class="content">{{ new_workcell.z_max(class_="form-control", style="text-align: center") }}</td>
+            </tr>
+        </table>
+        <p>
+            {{ new_workcell.submit_workcell(style="width: 100%", class_="btn btn-primary btn-blk") }}
+        </p>
+    </form>
+    {% include 'includes/_messages.html' %}
+</div>
+{% endblock %}
